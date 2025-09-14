@@ -56,6 +56,44 @@ export type Database = {
         }
         Relationships: []
       }
+      site_buena_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          preferences: Json | null
+          role: string | null
+          site_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          preferences?: Json | null
+          role?: string | null
+          site_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          preferences?: Json | null
+          role?: string | null
+          site_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_buena_profiles_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_members: {
         Row: {
           active: boolean | null
@@ -135,6 +173,47 @@ export type Database = {
           },
         ]
       }
+      site_web3analytics_profiles: {
+        Row: {
+          api_quota: number | null
+          created_at: string
+          id: string
+          notification_preferences: Json | null
+          site_id: string
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_quota?: number | null
+          created_at?: string
+          id?: string
+          notification_preferences?: Json | null
+          site_id: string
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_quota?: number | null
+          created_at?: string
+          id?: string
+          notification_preferences?: Json | null
+          site_id?: string
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_web3analytics_profiles_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sites: {
         Row: {
           active: boolean | null
@@ -170,6 +249,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_x_account: {
+        Args: {
+          p_affiliation?: string
+          p_description?: string
+          p_display_name?: string
+          p_username: string
+        }
+        Returns: string
+      }
+      delete_x_account: {
+        Args: { p_account_id: string }
+        Returns: undefined
+      }
       ensure_membership_for_domain: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -177,6 +269,16 @@ export type Database = {
       get_current_site_id: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_user_buena_profile: {
+        Args: { site_schema: string }
+        Returns: {
+          created_at: string
+          id: string
+          preferences: Json
+          role: string
+          updated_at: string
+        }[]
       }
       get_user_regatta_profile: {
         Args: { site_schema: string }
@@ -190,6 +292,29 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_user_web3analytics_profile: {
+        Args: { site_schema: string }
+        Returns: {
+          api_quota: number
+          created_at: string
+          id: string
+          notification_preferences: Json
+          subscription_tier: string
+          updated_at: string
+        }[]
+      }
+      get_x_accounts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          affiliation: string
+          created_at: string
+          description: string
+          display_name: string
+          id: string
+          updated_at: string
+          username: string
+        }[]
+      }
       initialize_regatta_profile_for_site: {
         Args: { target_site_id: string }
         Returns: string
@@ -200,6 +325,16 @@ export type Database = {
       }
       update_user_credits: {
         Args: { credit_change: number }
+        Returns: undefined
+      }
+      update_x_account: {
+        Args: {
+          p_account_id: string
+          p_affiliation?: string
+          p_description?: string
+          p_display_name?: string
+          p_username?: string
+        }
         Returns: undefined
       }
       user_in_site: {
