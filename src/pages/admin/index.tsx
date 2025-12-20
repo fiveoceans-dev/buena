@@ -1,29 +1,16 @@
-import { Routes, Route } from 'react-router-dom';
-import { AdminLayout } from '@/components/admin/AdminLayout';
-import { ManagerRoute } from '@/components/auth/ProtectedRoute';
-import Dashboard from './Dashboard';
-import Products from './Products';
-import Analytics from './Analytics';
-import Inventory from './Inventory';
-import Pricing from './Pricing';
-import Orders from './Orders';
-import Customers from './Customers';
+import { Navigate, Routes, Route } from 'react-router-dom';
 
 export default function AdminIndex() {
   return (
-    <ManagerRoute>
-      <AdminLayout>
-        <Routes>
-          <Route index element={<Dashboard />} />
-          <Route path="products" element={<Products />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="inventory" element={<Inventory />} />
-          <Route path="customers" element={<Customers />} />
-          <Route path="pricing" element={<Pricing />} />
-          <Route path="analytics" element={<Analytics />} />
-          {/* Add more admin routes here as we implement them */}
-        </Routes>
-      </AdminLayout>
-    </ManagerRoute>
+    <Routes>
+      <Route index element={<Navigate to="/dashboard" replace />} />
+      <Route path="products" element={<Navigate to="/products" replace />} />
+      <Route path="orders" element={<Navigate to="/orders" replace />} />
+      <Route path="inventory" element={<Navigate to="/inventory" replace />} />
+      <Route path="customers" element={<Navigate to="/customers" replace />} />
+      <Route path="pricing" element={<Navigate to="/pricing" replace />} />
+      <Route path="analytics" element={<Navigate to="/analytics" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 }

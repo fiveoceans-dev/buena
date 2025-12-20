@@ -283,7 +283,7 @@ class PerformanceService {
   preloadRoute(route: string): void {
     // Preload critical resources for a route
     switch (route) {
-      case '/admin':
+      case '/dashboard':
         // Note: Vite handles code-splitting filenames; avoid preloading non-existent JS paths here.
         break;
       case '/customer':

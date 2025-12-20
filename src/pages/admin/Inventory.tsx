@@ -1,26 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Package,
-  AlertTriangle,
-  TrendingDown,
-  TrendingUp,
-  Search,
-  Filter,
-  Plus,
-  Edit,
-  Clock,
-  MapPin,
-  Calendar,
-  DollarSign
-} from 'lucide-react';
+import { Search } from 'lucide-react';
 import { mockDb } from '@/data/mockData';
 import { toast } from '@/hooks/use-toast';
 
@@ -58,21 +42,19 @@ const Inventory = () => {
 
   // Get stock status
   const getStockStatus = (item: any) => {
-    const product = mockDb.getProductById(item.product_id);
-
     if (item.quantity_available === 0) {
-      return { status: 'Out of Stock', color: 'bg-red-100 text-red-800', icon: TrendingDown };
+      return { status: 'Out of Stock', tone: 'text-black' };
     }
 
     if (item.quantity_available <= item.min_stock_level) {
-      return { status: 'Low Stock', color: 'bg-yellow-100 text-yellow-800', icon: AlertTriangle };
+      return { status: 'Low Stock', tone: 'text-black/70' };
     }
 
     if (item.quantity_available >= item.max_stock_level) {
-      return { status: 'Overstock', color: 'bg-blue-100 text-blue-800', icon: TrendingUp };
+      return { status: 'Overstock', tone: 'text-black/50' };
     }
 
-    return { status: 'In Stock', color: 'bg-green-100 text-green-800', icon: Package };
+    return { status: 'In Stock', tone: 'text-black/40' };
   };
 
   // Check expiry status
@@ -84,15 +66,15 @@ const Inventory = () => {
     const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysUntilExpiry <= 0) {
-      return { status: 'Expired', color: 'bg-red-100 text-red-800' };
+      return { status: 'Expired', tone: 'text-black' };
     }
 
     if (daysUntilExpiry <= 30) {
-      return { status: `Expires in ${daysUntilExpiry} days`, color: 'bg-orange-100 text-orange-800' };
+      return { status: `Expires in ${daysUntilExpiry} days`, tone: 'text-black/70' };
     }
 
     if (daysUntilExpiry <= 90) {
-      return { status: `Expires in ${daysUntilExpiry} days`, color: 'bg-yellow-100 text-yellow-800' };
+      return { status: `Expires in ${daysUntilExpiry} days`, tone: 'text-black/50' };
     }
 
     return null;
@@ -115,179 +97,172 @@ const Inventory = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
+    <div className="space-y-8 text-black">
+      <div className="overflow-x-auto">
+        <div className="flex items-center gap-4 whitespace-nowrap text-[12px] text-black">
+          <span className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+            Inventory
+          </span>
+          <Button
+            variant="link"
+            className="h-auto p-0 text-[11px] uppercase tracking-[0.2em]"
+          >
+            Add Inventory Item
+          </Button>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Inventory Item
-        </Button>
       </div>
 
-      {/* Alerts */}
       {(lowStockCount > 0 || outOfStockCount > 0) && (
-        <div className="space-y-3">
+        <div className="border-y border-black/10 py-3 text-xs text-black/60 flex flex-wrap items-center gap-4">
           {lowStockCount > 0 && (
-            <Alert className="border-yellow-200 bg-yellow-50">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              <AlertDescription className="text-yellow-800">
-                <strong>{lowStockCount} items</strong> are running low on stock and need attention.
-              </AlertDescription>
-            </Alert>
+            <span>
+              Low stock: <span className="text-black tabular-nums">{lowStockCount}</span>
+            </span>
           )}
           {outOfStockCount > 0 && (
-            <Alert className="border-red-200 bg-red-50">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">
-                <strong>{outOfStockCount} items</strong> are completely out of stock.
-              </AlertDescription>
-            </Alert>
+            <span>
+              Out of stock: <span className="text-black tabular-nums">{outOfStockCount}</span>
+            </span>
           )}
         </div>
       )}
 
-      {/* Single-line metrics */}
-      <div className="text-sm text-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="text-xs text-black/60 flex flex-wrap items-center gap-x-3 gap-y-1">
         <span>
-          Items: <span className="font-medium text-foreground tabular-nums">{totalItems.toLocaleString()}</span>
+          Items: <span className="font-medium text-black tabular-nums">{totalItems.toLocaleString()}</span>
         </span>
         <span aria-hidden="true">•</span>
         <span>
           Value:{' '}
-          <span className="font-medium text-foreground tabular-nums">
+          <span className="font-medium text-black tabular-nums">
             ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </span>
         <span aria-hidden="true">•</span>
         <span>
-          Low stock: <span className="font-medium text-foreground tabular-nums">{lowStockCount}</span>
+          Low stock: <span className="font-medium text-black tabular-nums">{lowStockCount}</span>
         </span>
         <span aria-hidden="true">•</span>
         <span>
-          Out of stock: <span className="font-medium text-foreground tabular-nums">{outOfStockCount}</span>
+          Out of stock: <span className="font-medium text-black tabular-nums">{outOfStockCount}</span>
         </span>
       </div>
 
-      {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="locations">By Location</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
+        <TabsList className="h-auto bg-transparent p-0 text-[12px] text-black/60 gap-4">
+          <TabsTrigger
+            value="overview"
+            className="px-0 py-0 text-[11px] uppercase tracking-[0.2em] data-[state=active]:text-black data-[state=active]:underline data-[state=active]:underline-offset-4 data-[state=active]:shadow-none"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="locations"
+            className="px-0 py-0 text-[11px] uppercase tracking-[0.2em] data-[state=active]:text-black data-[state=active]:underline data-[state=active]:underline-offset-4 data-[state=active]:shadow-none"
+          >
+            By Location
+          </TabsTrigger>
+          <TabsTrigger
+            value="alerts"
+            className="px-0 py-0 text-[11px] uppercase tracking-[0.2em] data-[state=active]:text-black data-[state=active]:underline data-[state=active]:underline-offset-4 data-[state=active]:shadow-none"
+          >
+            Alerts
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
-          {/* Search and Filters */}
-          <div className="rounded-md border p-4">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-foreground/40" />
-                  <Input
-                    placeholder="Search products or locations..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="All Locations" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map(location => (
-                    <SelectItem key={location} value={location}>
-                      {location}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <TabsContent value="overview" className="mt-6 space-y-6">
+          <div className="flex flex-wrap gap-4">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-0 top-3 h-4 w-4 text-black/40" />
+              <Input
+                placeholder="Search products or locations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-6 border-0 shadow-none rounded-[5px] bg-gray-100 h-9 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
             </div>
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger className="w-48 border-0 shadow-none rounded-[5px] px-3 bg-gray-100 h-9 text-xs focus:ring-0 focus-visible:ring-0">
+                <SelectValue placeholder="All Locations" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Locations</SelectItem>
+                {locations.map(location => (
+                  <SelectItem key={location} value={location}>
+                    {location}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Inventory Table */}
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Stock Level</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Expiry</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Actions</TableHead>
+          <div className="border-t border-black/10">
+            <Table className="text-xs">
+              <TableHeader className="[&_tr]:border-black/10">
+                <TableRow className="hover:bg-transparent border-black/10">
+                  <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Product</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Location</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Stock</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Status</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Expiry</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Value</TableHead>
+                  <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Actions</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="[&_tr]:border-black/10">
                 {filteredInventory.map((item) => {
                   const product = mockDb.getProductById(item.product_id);
                   const stockStatus = getStockStatus(item);
                   const expiryStatus = getExpiryStatus(item.expiry_date);
-                  const StatusIcon = stockStatus.icon;
 
                   return (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{product?.name}</div>
-                          <div className="text-sm text-foreground/70">{item.batch_number}</div>
+                    <TableRow key={item.id} className="hover:bg-transparent">
+                      <TableCell className="px-2 py-3">
+                        <div className="font-medium">{product?.name}</div>
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+                          {item.batch_number}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-2 text-foreground/40" />
-                          <div>
-                            <div className="font-medium">{item.warehouse_name}</div>
-                            <div className="text-sm text-foreground/70">
-                              {item.aisle} - {item.shelf}
-                            </div>
-                          </div>
+                      <TableCell className="px-2 py-3">
+                        <div className="font-medium">{item.warehouse_name}</div>
+                        <div className="text-[10px] text-black/40">
+                          {item.aisle} - {item.shelf}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="font-medium">{item.quantity_available}</div>
-                          <div className="text-sm text-foreground/70">
-                            Min: {item.min_stock_level} / Max: {item.max_stock_level || '∞'}
-                          </div>
+                      <TableCell className="px-2 py-3">
+                        <div className="font-medium tabular-nums">{item.quantity_available}</div>
+                        <div className="text-[10px] text-black/40">
+                          Min {item.min_stock_level} / Max {item.max_stock_level || '∞'}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge className={stockStatus.color}>
-                          <StatusIcon className="h-3 w-3 mr-1" />
+                      <TableCell className="px-2 py-3">
+                        <span className={`text-[10px] uppercase tracking-[0.2em] ${stockStatus.tone}`}>
                           {stockStatus.status}
-                        </Badge>
+                        </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-2 py-3">
                         {expiryStatus ? (
-                          <Badge className={expiryStatus.color}>
-                            <Clock className="h-3 w-3 mr-1" />
+                          <span className={`text-[10px] uppercase tracking-[0.2em] ${expiryStatus.tone}`}>
                             {expiryStatus.status}
-                          </Badge>
+                          </span>
                         ) : (
-                          <span className="text-foreground/50">-</span>
+                          <span className="text-black/30">-</span>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <div className="font-medium">
+                      <TableCell className="px-2 py-3">
+                        <div className="font-medium tabular-nums">
                           ${(item.quantity_available * (item.cost_price || 0)).toFixed(2)}
                         </div>
-                        <div className="text-sm text-foreground/70">
+                        <div className="text-[10px] text-black/40 tabular-nums">
                           @ ${(item.cost_price || 0).toFixed(2)}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
+                      <TableCell className="px-2 py-3">
+                        <div className="flex items-center gap-4 text-[10px] uppercase tracking-[0.2em]">
+                          <Button variant="ghost" size="sm" className="h-auto p-0">
+                            Edit
                           </Button>
-                          <Button variant="outline" size="sm">
+                          <Button variant="ghost" size="sm" className="h-auto p-0">
                             Move
                           </Button>
                         </div>
@@ -300,85 +275,83 @@ const Inventory = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="locations" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <TabsContent value="locations" className="mt-6">
+          <div className="border-t border-black/10 divide-y divide-black/10">
             {locations.map(location => {
               const locationItems = inventoryData.filter(item => item.warehouse_name === location);
               const totalValue = locationItems.reduce((sum, item) => {
                 return sum + (item.quantity_available * (item.cost_price || 0));
               }, 0);
+              const totalItemsByLocation = locationItems.reduce(
+                (sum, item) => sum + item.quantity_available,
+                0
+              );
+              const lowStockByLocation = locationItems.filter(
+                item => item.quantity_available <= item.min_stock_level
+              ).length;
 
               return (
-                <div key={location} className="rounded-md border p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <MapPin className="h-4 w-4 text-foreground/40" />
-                    {location}
-                  </div>
-                  <div className="text-sm text-foreground/70">
-                    {locationItems.length} items • ${totalValue.toLocaleString()} value
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-foreground/70">Total Items:</span>
-                      <div className="font-medium">
-                        {locationItems.reduce((sum, item) => sum + item.quantity_available, 0)}
-                      </div>
+                <div key={location} className="py-4 flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+                      {location}
                     </div>
-                    <div>
-                      <span className="text-foreground/70">Low Stock:</span>
-                      <div className="font-medium text-yellow-600">
-                        {locationItems.filter(item => item.quantity_available <= item.min_stock_level).length}
-                      </div>
+                    <div className="mt-1 text-xs text-black/50">
+                      {locationItems.length} items • ${totalValue.toLocaleString()} value
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full">
-                    View Details
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-black/60">
+                    <span>
+                      Total: <span className="text-black tabular-nums">{totalItemsByLocation}</span>
+                    </span>
+                    <span>
+                      Low stock: <span className="text-black tabular-nums">{lowStockByLocation}</span>
+                    </span>
+                    <Button variant="ghost" size="sm" className="h-auto p-0 text-[10px] uppercase tracking-[0.2em]">
+                      View
+                    </Button>
+                  </div>
                 </div>
               );
             })}
           </div>
         </TabsContent>
 
-        <TabsContent value="alerts" className="space-y-6">
-          {/* Low Stock Alerts */}
+        <TabsContent value="alerts" className="mt-6 space-y-8">
           <div className="space-y-3">
-            <div className="text-sm font-medium text-yellow-700">Low Stock Alerts</div>
-            <div className="space-y-4">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+              Low Stock
+            </div>
+            <div className="divide-y divide-black/10 text-xs">
               {lowStockItems.map((item) => {
                 const product = mockDb.getProductById(item.product_id);
                 return (
-                  <div key={item.id} className="flex items-center justify-between p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                    <div className="flex items-center space-x-3">
-                      <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                      <div>
-                        <div className="font-medium">{product?.name}</div>
-                        <div className="text-sm text-foreground/70">
-                          {item.warehouse_name} • {item.aisle}-{item.shelf}
-                        </div>
+                  <div key={item.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="font-medium text-black">{product?.name}</div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+                        {item.warehouse_name} • {item.aisle}-{item.shelf}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-medium text-yellow-700">
-                        {item.quantity_available} / {item.reorder_point} units
-                      </div>
+                    <div className="text-black/60 tabular-nums">
+                      {item.quantity_available} / {item.reorder_point} units
                     </div>
                   </div>
                 );
               })}
               {lowStockItems.length === 0 && (
-                <div className="text-center py-8 text-foreground/70">
-                  <Package className="h-12 w-12 mx-auto mb-4 text-foreground/30" />
-                  <p>All items are sufficiently stocked</p>
+                <div className="py-6 text-black/60">
+                  All items are sufficiently stocked.
                 </div>
               )}
             </div>
           </div>
 
-          {/* Expiry Alerts */}
           <div className="space-y-3">
-            <div className="text-sm font-medium text-orange-700">Expiry Alerts</div>
-            <div className="space-y-4">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+              Expiry
+            </div>
+            <div className="divide-y divide-black/10 text-xs">
               {inventoryData
                 .filter(item => item.expiry_date)
                 .filter(item => {
@@ -389,21 +362,18 @@ const Inventory = () => {
                   const product = mockDb.getProductById(item.product_id);
                   const expiry = getExpiryStatus(item.expiry_date);
                   return (
-                    <div key={item.id} className="flex items-center justify-between p-4 border border-orange-200 rounded-lg bg-orange-50">
-                      <div className="flex items-center space-x-3">
-                        <Calendar className="h-5 w-5 text-orange-600" />
-                        <div>
-                          <div className="font-medium">{product?.name}</div>
-                        <div className="text-sm text-foreground/70">
-                            Batch: {item.batch_number}
-                          </div>
+                    <div key={item.id} className="py-3 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="font-medium text-black">{product?.name}</div>
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+                          Batch {item.batch_number}
                         </div>
                       </div>
                       <div className="text-right">
-                        <Badge className={expiry?.color}>
+                        <div className={`text-[10px] uppercase tracking-[0.2em] ${expiry?.tone || 'text-black/50'}`}>
                           {expiry?.status}
-                        </Badge>
-                      <div className="text-sm text-foreground/70 mt-1">
+                        </div>
+                        <div className="text-black/50 tabular-nums">
                           {item.quantity_available} units
                         </div>
                       </div>
@@ -414,9 +384,8 @@ const Inventory = () => {
                 const expiry = getExpiryStatus(item.expiry_date);
                 return expiry && expiry.status.includes('Expires in');
               }).length === 0 && (
-                <div className="text-center py-8 text-foreground/70">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 text-foreground/30" />
-                  <p>No items approaching expiry</p>
+                <div className="py-6 text-black/60">
+                  No items approaching expiry.
                 </div>
               )}
             </div>
@@ -428,4 +397,3 @@ const Inventory = () => {
 };
 
 export default Inventory;
-

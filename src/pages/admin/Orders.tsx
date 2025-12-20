@@ -1,24 +1,15 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { mockDb } from '@/data/mockData';
 
-const statusBadge = (status: string) => {
+const statusTone = (status: string) => {
   switch (status) {
     case 'pending':
-      return <Badge variant="secondary">pending</Badge>;
-    case 'confirmed':
-      return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">confirmed</Badge>;
-    case 'processing':
-      return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">processing</Badge>;
-    case 'shipped':
-      return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">shipped</Badge>;
-    case 'delivered':
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">delivered</Badge>;
+      return 'text-black';
     case 'cancelled':
-      return <Badge variant="destructive">cancelled</Badge>;
+      return 'text-black/70';
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return 'text-black/50';
   }
 };
 
@@ -36,57 +27,67 @@ export default function Orders() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 text-black">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-        <Button variant="outline" disabled>
+        <span className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+          Orders
+        </span>
+        <Button
+          variant="link"
+          className="h-auto p-0 text-[11px] uppercase tracking-[0.2em]"
+          disabled
+        >
           Export (soon)
         </Button>
       </div>
 
-      <div className="text-sm text-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="text-xs text-black/60 flex flex-wrap items-center gap-x-3 gap-y-1">
         <span>
-          Orders: <span className="font-medium text-foreground tabular-nums">{totals.count}</span>
+          Orders: <span className="font-medium text-black tabular-nums">{totals.count}</span>
         </span>
         <span aria-hidden="true">•</span>
         <span>
-          Pending: <span className="font-medium text-foreground tabular-nums">{totals.pending}</span>
+          Pending: <span className="font-medium text-black tabular-nums">{totals.pending}</span>
         </span>
         <span aria-hidden="true">•</span>
         <span>
           Revenue:{' '}
-          <span className="font-medium text-foreground tabular-nums">
+          <span className="font-medium text-black tabular-nums">
             ${totals.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </span>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Delivery</TableHead>
-              <TableHead>Created</TableHead>
+      <div className="border-t border-black/10">
+        <Table className="text-xs">
+          <TableHeader className="[&_tr]:border-black/10">
+            <TableRow className="hover:bg-transparent border-black/10">
+              <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Order</TableHead>
+              <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Customer</TableHead>
+              <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Status</TableHead>
+              <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Total</TableHead>
+              <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Delivery</TableHead>
+              <TableHead className="text-[10px] uppercase tracking-[0.2em] text-black/40 font-normal">Created</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="[&_tr]:border-black/10">
             {orders.map((o) => (
-              <TableRow key={o.id}>
-                <TableCell className="font-medium">{o.orderNumber}</TableCell>
-                <TableCell>{o.customer?.email ?? o.customerId}</TableCell>
-                <TableCell className="capitalize">{statusBadge(o.status)}</TableCell>
-                <TableCell className="tabular-nums">${o.total.toFixed(2)}</TableCell>
-                <TableCell>{o.deliveryDate ?? '-'}</TableCell>
-                <TableCell>{new Date(o.createdAt).toLocaleDateString()}</TableCell>
+              <TableRow key={o.id} className="hover:bg-transparent">
+                <TableCell className="px-2 py-3 font-medium">{o.orderNumber}</TableCell>
+                <TableCell className="px-2 py-3">{o.customer?.email ?? o.customerId}</TableCell>
+                <TableCell className="px-2 py-3">
+                  <span className={`text-[10px] uppercase tracking-[0.2em] ${statusTone(o.status)}`}>
+                    {o.status}
+                  </span>
+                </TableCell>
+                <TableCell className="px-2 py-3 tabular-nums">${o.total.toFixed(2)}</TableCell>
+                <TableCell className="px-2 py-3">{o.deliveryDate ?? '-'}</TableCell>
+                <TableCell className="px-2 py-3">{new Date(o.createdAt).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}
             {orders.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-foreground/70 py-8">
+                <TableCell colSpan={6} className="text-center text-black/60 py-8">
                   No orders yet.
                 </TableCell>
               </TableRow>
@@ -97,5 +98,4 @@ export default function Orders() {
     </div>
   );
 }
-
 

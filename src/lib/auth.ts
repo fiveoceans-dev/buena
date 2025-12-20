@@ -1,6 +1,13 @@
 import { mockDb } from '@/data/mockData';
 import { User } from '@/data/mockData';
 
+// Temporary switch to bypass auth in development.
+export const AUTH_DISABLED = true;
+
+const getAuthDisabledUser = (): User | null => {
+  return mockDb.getUserByEmail('admin@buena.com') || mockDb.getUsers()[0] || null;
+};
+
 export interface MagicLinkRequest {
   email: string;
   redirectTo?: string;
@@ -101,6 +108,10 @@ class AuthService {
 
   // Get current user
   getCurrentUser(): User | null {
+    if (AUTH_DISABLED) {
+      return getAuthDisabledUser();
+    }
+
     try {
       const userJson = localStorage.getItem(this.USER_KEY);
       return userJson ? JSON.parse(userJson) : null;

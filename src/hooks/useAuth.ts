@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getAuthUser, User } from '@/lib/auth';
+import { AUTH_DISABLED, getAuthUser, User } from '@/lib/auth';
 
 export interface AuthUser {
   id: string;
@@ -12,10 +12,14 @@ export interface AuthUser {
  * Hook to get current authenticated user with role information
  */
 export function useAuth() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(() => (AUTH_DISABLED ? getAuthUser() : null));
+  const [loading, setLoading] = useState(!AUTH_DISABLED);
 
   useEffect(() => {
+    if (AUTH_DISABLED) {
+      return;
+    }
+
     // Get initial user from localStorage
     const loadUser = () => {
       const authUser = getAuthUser();

@@ -33,7 +33,6 @@ export default function CustomerSettings() {
       <div>
         <Button
           variant="outline"
-          className="rounded-none border-black text-black hover:bg-black hover:text-white"
           onClick={handleSignOut}
         >
           Log out
@@ -42,5 +41,4 @@ export default function CustomerSettings() {
     </div>
   );
 }
-
 

@@ -41,14 +41,7 @@ const Login = () => {
             description: `Successfully signed in as ${user?.email}`,
           });
 
-          // Redirect based on user role
-          if (user?.role === 'customer') {
-            navigate('/customer/catalog');
-          } else if (user?.role === 'admin' || user?.role === 'manager' || user?.role === 'warehouse') {
-            navigate('/admin');
-          } else {
-            navigate('/');
-          }
+          navigate('/dashboard');
         } else {
           // Non-demo user - show success message for magic link
           setIsSuccess(true);

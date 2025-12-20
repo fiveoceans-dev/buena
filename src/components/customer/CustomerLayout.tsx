@@ -41,7 +41,8 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
     }
   };
 
-  const isActive = (href: string) => location.pathname === href;
+  const isActive = (href: string) =>
+    location.pathname === href || (href === '/customer/catalog' && location.pathname === '/dashboard');
 
   return (
     <div className="min-h-screen bg-white">
@@ -84,6 +85,9 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
         <div className="flex gap-10">
           {/* Left side menu (desktop) */}
           <aside className="hidden md:block w-40 shrink-0">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-black">
+              Buena Retailing
+            </div>
             <div className="mt-8 text-xs text-black/60 space-y-2">
               <div className="flex items-center gap-2">
                 <User className="h-3.5 w-3.5" />

@@ -1,27 +1,15 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/auth';
 import { toast } from '@/hooks/use-toast';
 import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Users,
-  TrendingUp,
-  Settings,
   LogOut,
   Menu,
-  X,
-  Warehouse,
-  AlertTriangle,
-  DollarSign
+  User,
+  X
 } from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -30,7 +18,6 @@ interface AdminLayoutProps {
 interface NavItem {
   title: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
   roles: string[];
   badge?: string;
 }
@@ -38,52 +25,44 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     title: 'Dashboard',
-    href: '/admin',
-    icon: LayoutDashboard,
+    href: '/dashboard',
     roles: ['admin', 'manager', 'warehouse'],
   },
   {
     title: 'Products',
-    href: '/admin/products',
-    icon: Package,
+    href: '/products',
     roles: ['admin', 'manager'],
   },
   {
     title: 'Orders',
-    href: '/admin/orders',
-    icon: ShoppingCart,
+    href: '/orders',
     roles: ['admin', 'manager', 'warehouse'],
   },
   {
     title: 'Inventory',
-    href: '/admin/inventory',
-    icon: AlertTriangle,
+    href: '/inventory',
     roles: ['admin', 'manager', 'warehouse'],
     badge: 'New'
   },
   {
     title: 'Customers',
-    href: '/admin/customers',
-    icon: Users,
+    href: '/customers',
     roles: ['admin', 'manager'],
   },
   {
     title: 'Pricing',
-    href: '/admin/pricing',
-    icon: DollarSign,
+    href: '/pricing',
     roles: ['admin', 'manager'],
     badge: 'New'
   },
   {
     title: 'Analytics',
-    href: '/admin/analytics',
-    icon: TrendingUp,
+    href: '/analytics',
     roles: ['admin', 'manager'],
   },
   {
     title: 'Settings',
-    href: '/admin/settings',
-    icon: Settings,
+    href: '/settings',
     roles: ['admin'],
   },
 ];
@@ -116,57 +95,57 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     item.roles.includes(user?.role || '') || user?.role === 'admin'
   );
 
+  const handleSignOutClick = () => {
+    setSidebarOpen(false);
+    void handleSignOut();
+  };
+
+  const navLinkClass = (isActive: boolean) =>
+    (isActive
+      ? 'underline underline-offset-4'
+      : 'hover:underline underline-offset-4 text-black/70') + ' flex items-center justify-between';
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Mobile sidebar overlay */}
+    <div className="min-h-screen bg-white text-black">
+      {/* Mobile top row */}
+      <div className="md:hidden px-4 py-4 flex items-center justify-end">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="rounded-none"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label="Menu"
+        >
+          {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      {/* Mobile menu */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        {/* Mobile-only close button row */}
-        <div className="flex items-center justify-end h-16 px-4 lg:hidden">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex flex-col h-full">
-          {/* User info */}
-          <div className="p-4 border-b">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-foreground">
-                  {user?.email?.[0]?.toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {user?.email?.split('@')[0]}
-                </p>
-                <Badge variant="secondary" className="text-xs capitalize">
-                  {user?.role}
-                </Badge>
-              </div>
+        <div className="md:hidden px-4 pb-6 space-y-6">
+          <div className="text-[11px] uppercase tracking-[0.2em] text-black">
+            Buena Retailing
+          </div>
+          <div className="text-xs text-black/60 space-y-2">
+            <div className="flex items-center gap-2">
+              <User className="h-3.5 w-3.5" />
+              <span className="truncate">{user?.email}</span>
             </div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+              {user?.role} access
+            </div>
+            <button
+              type="button"
+              onClick={handleSignOutClick}
+              className="inline-flex items-center gap-2 text-black hover:underline underline-offset-4"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Log out
+            </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className="space-y-3 text-sm text-black">
             {filteredNavItems.map((item) => {
-              const Icon = item.icon;
               const isActive = location.pathname === item.href;
 
               return (
@@ -174,61 +153,73 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   key={item.href}
                   to={item.href}
                   onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors border-l-2 border-transparent",
-                    isActive
-                      ? "bg-muted text-foreground border-foreground"
-                      : "text-foreground/70 hover:bg-muted hover:text-foreground"
-                  )}
+                  className={navLinkClass(isActive)}
                 >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.title}
+                  <span>{item.title}</span>
                   {item.badge && (
-                    <Badge variant="secondary" className="ml-auto text-xs">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-black/40">
                       {item.badge}
-                    </Badge>
+                    </span>
                   )}
                 </Link>
               );
             })}
           </nav>
-
-          <Separator />
-
-          {/* Sign out */}
-          <div className="p-4">
-            <Button
-              variant="ghost"
-              onClick={handleSignOut}
-              className="w-full justify-start text-foreground/70 hover:text-foreground"
-            >
-              <LogOut className="mr-3 h-4 w-4" />
-              Sign Out
-            </Button>
-          </div>
         </div>
-      </div>
+      )}
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top bar for mobile */}
-        <div className="sticky top-0 z-30 bg-card border-b border-border lg:hidden">
-          <div className="flex items-center justify-between h-16 px-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div className="w-8" /> {/* Spacer */}
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex gap-10">
+          {/* Left side menu (desktop) */}
+          <aside className="hidden md:block w-48 shrink-0">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-black">
+              Buena Retailing
+            </div>
+            <div className="mt-6 text-xs text-black/60 space-y-2">
+              <div className="flex items-center gap-2">
+                <User className="h-3.5 w-3.5" />
+                <span className="truncate">{user?.email}</span>
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+                {user?.role} access
+              </div>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex items-center gap-2 text-black hover:underline underline-offset-4"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Log out
+              </button>
+            </div>
+
+            <nav className="mt-6 space-y-3 text-sm text-black">
+            {filteredNavItems.map((item) => {
+              const isActive = location.pathname === item.href;
+
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={navLinkClass(isActive)}
+                  >
+                    <span>{item.title}</span>
+                    {item.badge && (
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          </aside>
+
+          {/* Main content */}
+          <main className="flex-1 min-w-0">
+            {children}
+          </main>
         </div>
-
-        {/* Page content */}
-        <main className="p-4 lg:p-8">
-          {children}
-        </main>
       </div>
     </div>
   );

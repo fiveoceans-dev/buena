@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle, XCircle, Mail } from 'lucide-react';
-import { validateMagicLink, getCurrentUser } from '@/lib/auth';
+import { validateMagicLink } from '@/lib/auth';
 import { toast } from '@/hooks/use-toast';
 
 const VerifyMagicLink = () => {
@@ -36,15 +36,7 @@ const VerifyMagicLink = () => {
             description: 'You have been successfully signed in.',
           });
 
-          // Redirect based on user role
-          const user = getCurrentUser();
-          let redirectPath = '/';
-
-          if (user?.role === 'customer') {
-            redirectPath = '/customer/catalog';
-          } else if (user?.role === 'admin' || user?.role === 'manager' || user?.role === 'warehouse') {
-            redirectPath = '/admin';
-          }
+          const redirectPath = '/dashboard';
 
           // Redirect after a short delay to show success message
           setTimeout(() => {
@@ -148,4 +140,3 @@ const VerifyMagicLink = () => {
 };
 
 export default VerifyMagicLink;
-

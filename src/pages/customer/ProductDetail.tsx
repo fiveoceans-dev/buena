@@ -1,9 +1,6 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Star, ShoppingCart, Heart, Minus, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { Star, Minus, Plus } from 'lucide-react';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -34,137 +31,167 @@ const ProductDetail = () => {
     }
   };
 
-  const [quantity, setQuantity] = React.useState(1);
+  const [quantity, setQuantity] = useState(1);
 
   const handleQuantityChange = (change: number) => {
     setQuantity(prev => Math.max(1, prev + change));
   };
 
+  const statusLabel = product.isInStock ? 'IN STOCK' : 'BACK ORDER';
+  const actionLabel = product.isInStock ? 'ORDER' : 'RESERVE';
+  const itemId = id ?? product.id;
+  const tagLabel = product.tags.join(' / ');
+
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="space-y-10 text-black">
+      <div className="flex flex-col gap-2 text-[11px] uppercase tracking-[0.2em] text-black/60 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link to="/customer/catalog" className="hover:underline underline-offset-4">
+            Catalog
+          </Link>
+          <span className="text-black/30">/</span>
+          <span>{product.category}</span>
+          <span className="text-black/30">/</span>
+          <span>Item {itemId}</span>
+        </div>
+        <span className={product.isInStock ? 'text-black' : 'text-black/40'}>{statusLabel}</span>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         {/* Product Images */}
-        <div className="space-y-4">
-          <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+        <div className="space-y-3">
+          <div className="aspect-square bg-gray-100 overflow-hidden">
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           </div>
-          {/* Additional images would go here */}
         </div>
 
         {/* Product Info */}
         <div className="space-y-6">
-          <div>
-            <div className="flex items-center space-x-2 mb-2">
-              <Badge variant="secondary">{product.category}</Badge>
-              {product.tags.map(tag => (
-                <Badge key={tag} variant="outline" className="capitalize">
-                  {tag}
-                </Badge>
-              ))}
+          <div className="space-y-3">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-black/50">
+              {tagLabel}
             </div>
-
-            <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
-
-            <div className="flex items-center space-x-2 mt-2">
-              <div className="flex items-center">
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              {product.name}
+            </h1>
+            <div className="flex items-center gap-2 text-xs text-black/60">
+              <div className="flex items-center gap-0.5 text-black">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-5 w-5 ${
+                    className={`h-4 w-4 ${
                       i < Math.floor(product.rating)
-                        ? 'text-yellow-400 fill-current'
-                        : 'text-gray-300'
+                        ? 'text-black fill-current'
+                        : 'text-black/20'
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-sm text-gray-600">
-                {product.rating} ({product.reviewCount} reviews)
-              </span>
+              <span className="tabular-nums">{product.rating}</span>
+              <span className="text-black/40">({product.reviewCount})</span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <span className="text-3xl font-bold">${product.price}</span>
+          <div className="flex flex-wrap items-end gap-3">
+            <span className="text-3xl font-semibold tabular-nums">${product.price}</span>
             {product.originalPrice && (
-              <span className="text-xl text-gray-500 line-through">
+              <span className="text-sm text-black/40 line-through tabular-nums">
                 ${product.originalPrice}
               </span>
             )}
             {product.originalPrice && (
-              <Badge className="bg-green-100 text-green-800">
+              <span className="text-[11px] uppercase tracking-[0.2em] text-black/60">
                 Save ${(product.originalPrice - product.price).toFixed(2)}
-              </Badge>
+              </span>
             )}
           </div>
 
-          <Separator />
-
-          {/* Quantity and Add to Cart */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <span className="font-medium">Quantity:</span>
-              <div className="flex items-center border rounded-lg">
-                <Button
-                  variant="ghost"
-                  size="sm"
+          {/* Quantity and Actions */}
+          <div className="space-y-4 border-y border-black/10 py-4">
+            <div className="flex items-center justify-between text-xs">
+              <span className="uppercase tracking-[0.2em] text-black/50">Qty</span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
                   onClick={() => handleQuantityChange(-1)}
                   disabled={quantity <= 1}
+                  className="flex h-7 w-7 items-center justify-center border border-black/10 text-black/60 transition hover:border-black/30 hover:text-black disabled:opacity-30"
+                  aria-label="Decrease quantity"
                 >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="px-4 py-2 min-w-12 text-center">{quantity}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                  <Minus className="h-3.5 w-3.5" />
+                </button>
+                <span className="min-w-6 text-center tabular-nums">{quantity}</span>
+                <button
+                  type="button"
                   onClick={() => handleQuantityChange(1)}
+                  className="flex h-7 w-7 items-center justify-center border border-black/10 text-black/60 transition hover:border-black/30 hover:text-black"
+                  aria-label="Increase quantity"
                 >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
               </div>
             </div>
 
-            <div className="flex space-x-3">
-              <Button className="flex-1" size="lg" disabled={!product.isInStock}>
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                {product.isInStock ? 'Add to Cart' : 'Out of Stock'}
-              </Button>
-              <Button variant="outline" size="lg">
-                <Heart className="h-5 w-5" />
-              </Button>
+            <div className="flex items-center gap-6 text-xs uppercase tracking-[0.2em]">
+              <button
+                type="button"
+                disabled={!product.isInStock}
+                className="underline underline-offset-4 transition hover:text-black/70 disabled:opacity-30 disabled:no-underline"
+              >
+                {actionLabel}
+              </button>
+              <button type="button" className="underline underline-offset-4 transition hover:text-black/70">
+                Save
+              </button>
             </div>
+            <p className="text-[11px] text-black/50">
+              {product.isInStock ? 'Ships within 24 hours.' : 'Available for back order.'}
+            </p>
           </div>
 
-          <Separator />
-
           {/* Product Details */}
-          <div className="space-y-4">
+          <div className="grid gap-6 text-sm">
             <div>
-              <h3 className="font-semibold mb-2">Description</h3>
-              <p className="text-gray-600">{product.description}</p>
+              <h3 className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+                Description
+              </h3>
+              <p className="mt-2 text-black/70">{product.description}</p>
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Details</h3>
-              <ul className="space-y-1">
+              <h3 className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+                Details
+              </h3>
+              <ul className="mt-2 space-y-2 text-black/70">
                 {product.details.map((detail, index) => (
-                  <li key={index} className="text-gray-600 flex items-center">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full mr-3 flex-shrink-0"></span>
-                    {detail}
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-black/40"></span>
+                    <span>{detail}</span>
                   </li>
                 ))}
               </ul>
             </div>
-          </div>
 
-          <Separator />
+            <div>
+              <h3 className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+                Nutrition
+              </h3>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-black/70">
+                <span className="text-black/50">Serving size</span>
+                <span className="text-right">{product.nutrition.servingSize}</span>
+                <span className="text-black/50">Calories</span>
+                <span className="text-right tabular-nums">{product.nutrition.calories}</span>
+                <span className="text-black/50">Caffeine</span>
+                <span className="text-right">{product.nutrition.caffeine}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   );
 };

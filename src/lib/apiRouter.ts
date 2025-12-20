@@ -1,5 +1,6 @@
 import { mockDb } from '@/data/mockData';
 import { mockUsers, mockProducts, mockCategories, mockOrders } from '@/data/mockData';
+import { AUTH_DISABLED } from '@/lib/auth';
 
 export interface APIRequest {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -168,6 +169,10 @@ class APIRouter {
   }
 
   private isAuthenticated(request: APIRequest): boolean {
+    if (AUTH_DISABLED) {
+      return true;
+    }
+
     // Check for API key in headers
     const apiKey = request.headers['x-api-key'] || request.headers['authorization'];
 
@@ -667,4 +672,3 @@ export function createMockFetch() {
     );
   };
 }
-
