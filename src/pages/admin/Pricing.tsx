@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -123,52 +122,25 @@ const Pricing = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Pricing & Promotions</h1>
-          <p className="text-muted-foreground">
-            Manage pricing tiers and promotional campaigns
-          </p>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Pricing Tiers</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pricingTiers.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Customer segmentation rules
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Promotions</CardTitle>
-            <Tag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activePromotions.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Running campaigns
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Discount Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalDiscountValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Savings provided to customers
-            </p>
-          </CardContent>
-        </Card>
+      {/* Single-line metrics */}
+      <div className="text-sm text-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span>
+          Tiers: <span className="font-medium text-foreground tabular-nums">{pricingTiers.length}</span>
+        </span>
+        <span aria-hidden="true">•</span>
+        <span>
+          Promotions: <span className="font-medium text-foreground tabular-nums">{activePromotions.length}</span>
+        </span>
+        <span aria-hidden="true">•</span>
+        <span>
+          Discount value:{' '}
+          <span className="font-medium text-foreground tabular-nums">
+            ${totalDiscountValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        </span>
       </div>
 
       {/* Main Content */}
@@ -180,91 +152,83 @@ const Pricing = () => {
         </TabsList>
 
         <TabsContent value="tiers" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Pricing Tiers</CardTitle>
-                  <CardDescription>
-                    Define pricing rules based on customer type and purchase volume
-                  </CardDescription>
-                </div>
-                <Dialog open={isCreateTierDialogOpen} onOpenChange={setIsCreateTierDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Tier
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Create Pricing Tier</DialogTitle>
-                      <DialogDescription>
-                        Set up a new pricing tier for customer segmentation
-                      </DialogDescription>
-                    </DialogHeader>
-                    <PricingTierForm onSubmit={handleCreateTier} onCancel={() => setIsCreateTierDialogOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Customer Type</TableHead>
-                      <TableHead>Min Quantity</TableHead>
-                      <TableHead>Discount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium">Pricing Tiers</div>
+              <Dialog open={isCreateTierDialogOpen} onOpenChange={setIsCreateTierDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Tier
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create Pricing Tier</DialogTitle>
+                    <DialogDescription>
+                      Set up a new pricing tier for customer segmentation
+                    </DialogDescription>
+                  </DialogHeader>
+                  <PricingTierForm onSubmit={handleCreateTier} onCancel={() => setIsCreateTierDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Customer Type</TableHead>
+                    <TableHead>Min Quantity</TableHead>
+                    <TableHead>Discount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pricingTiers.map((tier) => (
+                    <TableRow key={tier.id}>
+                      <TableCell className="font-medium">{tier.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {getCustomerTypeLabel(tier.customer_type)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{tier.min_quantity}+ units</TableCell>
+                      <TableCell>
+                        {tier.discount_percentage > 0 ? (
+                          <span className="text-green-600">{tier.discount_percentage}% off</span>
+                        ) : (
+                          <span className="text-blue-600">${tier.discount_amount} off</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={tier.is_active ? 'default' : 'secondary'}>
+                          {tier.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => setEditingTier(tier)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteTier(tier.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pricingTiers.map((tier) => (
-                      <TableRow key={tier.id}>
-                        <TableCell className="font-medium">{tier.name}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {getCustomerTypeLabel(tier.customer_type)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{tier.min_quantity}+ units</TableCell>
-                        <TableCell>
-                          {tier.discount_percentage > 0 ? (
-                            <span className="text-green-600">{tier.discount_percentage}% off</span>
-                          ) : (
-                            <span className="text-blue-600">${tier.discount_amount} off</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={tier.is_active ? 'default' : 'secondary'}>
-                            {tier.is_active ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="ghost" size="sm" onClick={() => setEditingTier(tier)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteTier(tier.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
 
           {/* Edit Tier Dialog */}
           <Dialog open={!!editingTier} onOpenChange={() => setEditingTier(null)}>
@@ -287,96 +251,85 @@ const Pricing = () => {
         </TabsContent>
 
         <TabsContent value="promotions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Promotional Campaigns</CardTitle>
-                  <CardDescription>
-                    Create and manage promotional offers and discounts
-                  </CardDescription>
-                </div>
-                <Dialog open={isCreatePromoDialogOpen} onOpenChange={setIsCreatePromoDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Promotion
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle>Create Promotion</DialogTitle>
-                      <DialogDescription>
-                        Set up a new promotional campaign
-                      </DialogDescription>
-                    </DialogHeader>
-                    <PromotionForm onSubmit={handleCreatePromotion} onCancel={() => setIsCreatePromoDialogOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {promotions.map((promo) => {
-                  const TypeIcon = getPromotionTypeIcon(promo.type);
-                  return (
-                    <Card key={promo.id} className="border-l-4 border-l-blue-500">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <TypeIcon className="h-8 w-8 text-blue-600" />
-                            <div>
-                              <h3 className="font-semibold">{promo.name}</h3>
-                              <p className="text-sm text-muted-foreground">{promo.description}</p>
-                              <div className="flex items-center space-x-2 mt-2">
-                                <Badge variant="outline">{promo.type.replace('_', ' ')}</Badge>
-                                <Badge variant={promo.is_active ? 'default' : 'secondary'}>
-                                  {promo.is_active ? 'Active' : 'Inactive'}
-                                </Badge>
-                                <span className="text-sm text-muted-foreground">
-                                  Used {promo.usage_count} times
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="text-right">
-                              <div className="font-medium">
-                                {promo.type === 'percentage' ? `${promo.discount_value}% off` :
-                                 promo.type === 'fixed' ? `$${promo.discount_value} off` :
-                                 promo.type === 'free_shipping' ? 'Free Shipping' :
-                                 `${promo.discount_value} items free`}
-                              </div>
-                              <div className="text-sm text-muted-foreground">
-                                Valid until {new Date(promo.valid_until || promo.valid_from).toLocaleDateString()}
-                              </div>
-                            </div>
-                            <div className="flex flex-col space-y-1">
-                              <Switch
-                                checked={promo.is_active}
-                                onCheckedChange={(checked) => handleTogglePromotion(promo.id, checked)}
-                              />
-                              <Button variant="ghost" size="sm" onClick={() => setEditingPromo(promo)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium">Promotions</div>
+              <Dialog open={isCreatePromoDialogOpen} onOpenChange={setIsCreatePromoDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Promotion
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Create Promotion</DialogTitle>
+                    <DialogDescription>
+                      Set up a new promotional campaign
+                    </DialogDescription>
+                  </DialogHeader>
+                  <PromotionForm onSubmit={handleCreatePromotion} onCancel={() => setIsCreatePromoDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="space-y-4">
+              {promotions.map((promo) => {
+                const TypeIcon = getPromotionTypeIcon(promo.type);
+                return (
+                  <div key={promo.id} className="border-l-4 border-l-blue-500 rounded-md border p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <TypeIcon className="h-8 w-8 text-blue-600" />
+                        <div>
+                          <h3 className="font-semibold">{promo.name}</h3>
+                          <p className="text-sm text-foreground/70">{promo.description}</p>
+                          <div className="flex items-center space-x-2 mt-2">
+                            <Badge variant="outline">{promo.type.replace('_', ' ')}</Badge>
+                            <Badge variant={promo.is_active ? 'default' : 'secondary'}>
+                              {promo.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                            <span className="text-sm text-foreground/70">
+                              Used {promo.usage_count} times
+                            </span>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-
-                {promotions.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Target className="h-12 w-12 mx-auto mb-4" />
-                    <p>No promotional campaigns yet</p>
-                    <p className="text-sm">Create your first promotion to boost sales</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="text-right">
+                          <div className="font-medium">
+                            {promo.type === 'percentage' ? `${promo.discount_value}% off` :
+                             promo.type === 'fixed' ? `$${promo.discount_value} off` :
+                             promo.type === 'free_shipping' ? 'Free Shipping' :
+                             `${promo.discount_value} items free`}
+                          </div>
+                          <div className="text-sm text-foreground/70">
+                            Valid until {new Date(promo.valid_until || promo.valid_from).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <Switch
+                            checked={promo.is_active}
+                            onCheckedChange={(checked) => handleTogglePromotion(promo.id, checked)}
+                          />
+                          <Button variant="ghost" size="sm" onClick={() => setEditingPromo(promo)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                );
+              })}
+
+              {promotions.length === 0 && (
+                <div className="text-center py-8 text-foreground/70">
+                  <Target className="h-12 w-12 mx-auto mb-4 text-foreground/30" />
+                  <p>No promotional campaigns yet</p>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Edit Promotion Dialog */}
           <Dialog open={!!editingPromo} onOpenChange={() => setEditingPromo(null)}>
@@ -400,56 +353,42 @@ const Pricing = () => {
 
         <TabsContent value="analytics" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Pricing Impact</CardTitle>
-                <CardDescription>
-                  How pricing strategies affect your business
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      23%
-                    </div>
-                    <p className="text-sm text-muted-foreground">Avg Discount Rate</p>
+            <div className="rounded-md border p-4 space-y-3">
+              <div className="text-sm font-medium">Pricing Impact</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">
+                    23%
                   </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      $1,450
-                    </div>
-                    <p className="text-sm text-muted-foreground">Monthly Savings</p>
-                  </div>
+                  <p className="text-sm text-foreground/70">Avg Discount Rate</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">
+                    $1,450
+                  </div>
+                  <p className="text-sm text-foreground/70">Monthly Savings</p>
+                </div>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Promotion Performance</CardTitle>
-                <CardDescription>
-                  Effectiveness of promotional campaigns
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  {activePromotions.slice(0, 3).map((promo) => (
-                    <div key={promo.id} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-sm">{promo.name}</p>
-                        <p className="text-xs text-muted-foreground">{promo.usage_count} redemptions</p>
-                      </div>
-                      <Badge variant="outline">
-                        {promo.type === 'percentage' ? `${promo.discount_value}%` :
-                         promo.type === 'fixed' ? `$${promo.discount_value}` :
-                         'Free'}
-                      </Badge>
+            <div className="rounded-md border p-4 space-y-3">
+              <div className="text-sm font-medium">Promotion Performance</div>
+              <div className="space-y-3">
+                {activePromotions.slice(0, 3).map((promo) => (
+                  <div key={promo.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">{promo.name}</p>
+                      <p className="text-xs text-foreground/70">{promo.usage_count} redemptions</p>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    <Badge variant="outline">
+                      {promo.type === 'percentage' ? `${promo.discount_value}%` :
+                       promo.type === 'fixed' ? `$${promo.discount_value}` :
+                       'Free'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
@@ -696,3 +635,4 @@ const PromotionForm = ({ promotion, onSubmit, onCancel }: any) => {
 };
 
 export default Pricing;
+

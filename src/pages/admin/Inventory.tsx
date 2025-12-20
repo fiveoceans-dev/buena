@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -121,9 +120,6 @@ const Inventory = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
-          <p className="text-muted-foreground">
-            Track stock levels, manage locations, and monitor inventory health
-          </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -153,59 +149,26 @@ const Inventory = () => {
         </div>
       )}
 
-      {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Items</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalItems.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Units across all locations
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inventory Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Total value at cost
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{lowStockCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Below reorder point
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
-            <TrendingDown className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{outOfStockCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Items unavailable
-            </p>
-          </CardContent>
-        </Card>
+      {/* Single-line metrics */}
+      <div className="text-sm text-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span>
+          Items: <span className="font-medium text-foreground tabular-nums">{totalItems.toLocaleString()}</span>
+        </span>
+        <span aria-hidden="true">•</span>
+        <span>
+          Value:{' '}
+          <span className="font-medium text-foreground tabular-nums">
+            ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        </span>
+        <span aria-hidden="true">•</span>
+        <span>
+          Low stock: <span className="font-medium text-foreground tabular-nums">{lowStockCount}</span>
+        </span>
+        <span aria-hidden="true">•</span>
+        <span>
+          Out of stock: <span className="font-medium text-foreground tabular-nums">{outOfStockCount}</span>
+        </span>
       </div>
 
       {/* Main Content */}
@@ -218,135 +181,123 @@ const Inventory = () => {
 
         <TabsContent value="overview" className="space-y-6">
           {/* Search and Filters */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="Search products or locations..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
+          <div className="rounded-md border p-4">
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-foreground/40" />
+                  <Input
+                    placeholder="Search products or locations..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
-                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="All Locations" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Locations</SelectItem>
-                    {locations.map(location => (
-                      <SelectItem key={location} value={location}>
-                        {location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
-            </CardContent>
-          </Card>
+              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="All Locations" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {locations.map(location => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           {/* Inventory Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Inventory Items</CardTitle>
-              <CardDescription>
-                Detailed view of all inventory across locations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Product</TableHead>
-                      <TableHead>Location</TableHead>
-                      <TableHead>Stock Level</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Expiry</TableHead>
-                      <TableHead>Value</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredInventory.map((item) => {
-                      const product = mockDb.getProductById(item.product_id);
-                      const stockStatus = getStockStatus(item);
-                      const expiryStatus = getExpiryStatus(item.expiry_date);
-                      const StatusIcon = stockStatus.icon;
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Stock Level</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Expiry</TableHead>
+                  <TableHead>Value</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredInventory.map((item) => {
+                  const product = mockDb.getProductById(item.product_id);
+                  const stockStatus = getStockStatus(item);
+                  const expiryStatus = getExpiryStatus(item.expiry_date);
+                  const StatusIcon = stockStatus.icon;
 
-                      return (
-                        <TableRow key={item.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">{product?.name}</div>
-                              <div className="text-sm text-muted-foreground">{item.batch_number}</div>
+                  return (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{product?.name}</div>
+                          <div className="text-sm text-foreground/70">{item.batch_number}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-2 text-foreground/40" />
+                          <div>
+                            <div className="font-medium">{item.warehouse_name}</div>
+                            <div className="text-sm text-foreground/70">
+                              {item.aisle} - {item.shelf}
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                              <div>
-                                <div className="font-medium">{item.warehouse_name}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  {item.aisle} - {item.shelf}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="font-medium">{item.quantity_available}</div>
-                              <div className="text-sm text-muted-foreground">
-                                Min: {item.min_stock_level} / Max: {item.max_stock_level || '∞'}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge className={stockStatus.color}>
-                              <StatusIcon className="h-3 w-3 mr-1" />
-                              {stockStatus.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {expiryStatus ? (
-                              <Badge className={expiryStatus.color}>
-                                <Clock className="h-3 w-3 mr-1" />
-                                {expiryStatus.status}
-                              </Badge>
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="font-medium">
-                              ${(item.quantity_available * (item.cost_price || 0)).toFixed(2)}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              @ ${(item.cost_price || 0).toFixed(2)}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Button variant="outline" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                Move
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="font-medium">{item.quantity_available}</div>
+                          <div className="text-sm text-foreground/70">
+                            Min: {item.min_stock_level} / Max: {item.max_stock_level || '∞'}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={stockStatus.color}>
+                          <StatusIcon className="h-3 w-3 mr-1" />
+                          {stockStatus.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {expiryStatus ? (
+                          <Badge className={expiryStatus.color}>
+                            <Clock className="h-3 w-3 mr-1" />
+                            {expiryStatus.status}
+                          </Badge>
+                        ) : (
+                          <span className="text-foreground/50">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">
+                          ${(item.quantity_available * (item.cost_price || 0)).toFixed(2)}
+                        </div>
+                        <div className="text-sm text-foreground/70">
+                          @ ${(item.cost_price || 0).toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            Move
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </TabsContent>
 
         <TabsContent value="locations" className="space-y-6">
@@ -358,38 +309,32 @@ const Inventory = () => {
               }, 0);
 
               return (
-                <Card key={location}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <MapPin className="h-5 w-5 mr-2" />
-                      {location}
-                    </CardTitle>
-                    <CardDescription>
-                      {locationItems.length} items • ${totalValue.toLocaleString()} value
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Total Items:</span>
-                          <div className="font-medium">
-                            {locationItems.reduce((sum, item) => sum + item.quantity_available, 0)}
-                          </div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Low Stock:</span>
-                          <div className="font-medium text-yellow-600">
-                            {locationItems.filter(item => item.quantity_available <= item.min_stock_level).length}
-                          </div>
-                        </div>
+                <div key={location} className="rounded-md border p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <MapPin className="h-4 w-4 text-foreground/40" />
+                    {location}
+                  </div>
+                  <div className="text-sm text-foreground/70">
+                    {locationItems.length} items • ${totalValue.toLocaleString()} value
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-foreground/70">Total Items:</span>
+                      <div className="font-medium">
+                        {locationItems.reduce((sum, item) => sum + item.quantity_available, 0)}
                       </div>
-                      <Button variant="outline" className="w-full">
-                        View Details
-                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div>
+                      <span className="text-foreground/70">Low Stock:</span>
+                      <div className="font-medium text-yellow-600">
+                        {locationItems.filter(item => item.quantity_available <= item.min_stock_level).length}
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="w-full">
+                    View Details
+                  </Button>
+                </div>
               );
             })}
           </div>
@@ -397,102 +342,85 @@ const Inventory = () => {
 
         <TabsContent value="alerts" className="space-y-6">
           {/* Low Stock Alerts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-yellow-700">Low Stock Alerts</CardTitle>
-              <CardDescription>
-                Items that need immediate attention
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {lowStockItems.map((item) => {
+          <div className="space-y-3">
+            <div className="text-sm font-medium text-yellow-700">Low Stock Alerts</div>
+            <div className="space-y-4">
+              {lowStockItems.map((item) => {
+                const product = mockDb.getProductById(item.product_id);
+                return (
+                  <div key={item.id} className="flex items-center justify-between p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                    <div className="flex items-center space-x-3">
+                      <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                      <div>
+                        <div className="font-medium">{product?.name}</div>
+                        <div className="text-sm text-foreground/70">
+                          {item.warehouse_name} • {item.aisle}-{item.shelf}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium text-yellow-700">
+                        {item.quantity_available} / {item.reorder_point} units
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {lowStockItems.length === 0 && (
+                <div className="text-center py-8 text-foreground/70">
+                  <Package className="h-12 w-12 mx-auto mb-4 text-foreground/30" />
+                  <p>All items are sufficiently stocked</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Expiry Alerts */}
+          <div className="space-y-3">
+            <div className="text-sm font-medium text-orange-700">Expiry Alerts</div>
+            <div className="space-y-4">
+              {inventoryData
+                .filter(item => item.expiry_date)
+                .filter(item => {
+                  const expiry = getExpiryStatus(item.expiry_date);
+                  return expiry && (expiry.status.includes('Expires in') || expiry.status === 'Expired');
+                })
+                .map((item) => {
                   const product = mockDb.getProductById(item.product_id);
+                  const expiry = getExpiryStatus(item.expiry_date);
                   return (
-                    <div key={item.id} className="flex items-center justify-between p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                    <div key={item.id} className="flex items-center justify-between p-4 border border-orange-200 rounded-lg bg-orange-50">
                       <div className="flex items-center space-x-3">
-                        <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                        <Calendar className="h-5 w-5 text-orange-600" />
                         <div>
                           <div className="font-medium">{product?.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {item.warehouse_name} • {item.aisle}-{item.shelf}
+                        <div className="text-sm text-foreground/70">
+                            Batch: {item.batch_number}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium text-yellow-700">
-                          {item.quantity_available} / {item.reorder_point} units
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Reorder needed
+                        <Badge className={expiry?.color}>
+                          {expiry?.status}
+                        </Badge>
+                      <div className="text-sm text-foreground/70 mt-1">
+                          {item.quantity_available} units
                         </div>
                       </div>
                     </div>
                   );
                 })}
-                {lowStockItems.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Package className="h-12 w-12 mx-auto mb-4" />
-                    <p>All items are sufficiently stocked</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Expiry Alerts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-orange-700">Expiry Alerts</CardTitle>
-              <CardDescription>
-                Items approaching or past expiry date
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {inventoryData
-                  .filter(item => item.expiry_date)
-                  .filter(item => {
-                    const expiry = getExpiryStatus(item.expiry_date);
-                    return expiry && (expiry.status.includes('Expires in') || expiry.status === 'Expired');
-                  })
-                  .map((item) => {
-                    const product = mockDb.getProductById(item.product_id);
-                    const expiry = getExpiryStatus(item.expiry_date);
-                    return (
-                      <div key={item.id} className="flex items-center justify-between p-4 border border-orange-200 rounded-lg bg-orange-50">
-                        <div className="flex items-center space-x-3">
-                          <Calendar className="h-5 w-5 text-orange-600" />
-                          <div>
-                            <div className="font-medium">{product?.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              Batch: {item.batch_number}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <Badge className={expiry?.color}>
-                            {expiry?.status}
-                          </Badge>
-                          <div className="text-sm text-muted-foreground mt-1">
-                            {item.quantity_available} units
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                {inventoryData.filter(item => {
-                  const expiry = getExpiryStatus(item.expiry_date);
-                  return expiry && expiry.status.includes('Expires in');
-                }).length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Calendar className="h-12 w-12 mx-auto mb-4" />
-                    <p>No items approaching expiry</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              {inventoryData.filter(item => {
+                const expiry = getExpiryStatus(item.expiry_date);
+                return expiry && expiry.status.includes('Expires in');
+              }).length === 0 && (
+                <div className="text-center py-8 text-foreground/70">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 text-foreground/30" />
+                  <p>No items approaching expiry</p>
+                </div>
+              )}
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
@@ -500,3 +428,4 @@ const Inventory = () => {
 };
 
 export default Inventory;
+

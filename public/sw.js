@@ -386,3 +386,4 @@ async function clearApplicationCache() {
 
   console.log('Application cache cleared');
 }
+

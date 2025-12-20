@@ -62,9 +62,12 @@ class TenantService {
     if (typeof document !== 'undefined') {
       const root = document.documentElement;
 
-      // Apply color variables
+      // Apply tenant colors without overriding the app theme variables.
+      // NOTE: Our Tailwind/shadcn theme expects many CSS vars to be HSL components (used inside `hsl(var(--...))`).
+      // Tenant colors are currently stored as hex strings, so writing them into core vars like `--background`
+      // would break rendering. Keep them namespaced for future use.
       Object.entries(branding.colors).forEach(([key, value]) => {
-        root.style.setProperty(`--${key}`, value);
+        root.style.setProperty(`--tenant-${key}`, value);
       });
 
       // Apply font variables
@@ -152,3 +155,4 @@ export function hasIntegration(integrationType: keyof TenantConfig['integrations
 export function applyTenantBranding(): void {
   tenantService.applyBranding();
 }
+

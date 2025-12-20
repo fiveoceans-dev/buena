@@ -237,3 +237,4 @@ export function getCartSummary() {
 export function clearCart() {
   cartService.clearCart();
 }
+

@@ -423,3 +423,4 @@ INSERT INTO public.categories (name, description, display_order) VALUES
 ('Household', 'Household and cleaning products', 3),
 ('Personal Care', 'Personal care and hygiene products', 4)
 ON CONFLICT DO NOTHING;
+

@@ -117,7 +117,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -128,10 +128,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex items-center justify-end h-16 px-4">
+        {/* Mobile-only close button row */}
+        <div className="flex items-center justify-end h-16 px-4 lg:hidden">
           <Button
             variant="ghost"
             size="sm"
@@ -146,13 +147,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           {/* User info */}
           <div className="p-4 border-b">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-blue-600">
+              <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                <span className="text-sm font-medium text-foreground">
                   {user?.email?.[0]?.toUpperCase()}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user?.email?.split('@')[0]}
                 </p>
                 <Badge variant="secondary" className="text-xs capitalize">
@@ -174,10 +175,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   to={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors border-l-2 border-transparent",
                     isActive
-                      ? "bg-blue-100 text-blue-700 border-r-2 border-blue-700"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      ? "bg-muted text-foreground border-foreground"
+                      : "text-foreground/70 hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <Icon className="mr-3 h-5 w-5" />
@@ -199,7 +200,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <Button
               variant="ghost"
               onClick={handleSignOut}
-              className="w-full justify-start text-gray-600 hover:text-gray-900"
+              className="w-full justify-start text-foreground/70 hover:text-foreground"
             >
               <LogOut className="mr-3 h-4 w-4" />
               Sign Out
@@ -211,7 +212,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar for mobile */}
-        <div className="sticky top-0 z-30 bg-white border-b lg:hidden">
+        <div className="sticky top-0 z-30 bg-card border-b border-border lg:hidden">
           <div className="flex items-center justify-between h-16 px-4">
             <Button
               variant="ghost"
@@ -220,9 +221,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-lg font-light tracking-wider text-brand">
-              buena admin
-            </h1>
             <div className="w-8" /> {/* Spacer */}
           </div>
         </div>

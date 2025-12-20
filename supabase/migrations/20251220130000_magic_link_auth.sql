@@ -176,3 +176,4 @@ BEGIN
     RETURN customer_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+

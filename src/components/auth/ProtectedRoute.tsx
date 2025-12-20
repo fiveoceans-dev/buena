@@ -1,8 +1,11 @@
-import { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { ReactNode, useState } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { signOut } from '@/lib/auth';
+import { toast } from '@/hooks/use-toast';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -20,6 +23,27 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { user, loading, isAuthenticated } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      const result = await signOut();
+      if (result.success) {
+        toast({ title: 'Signed out' });
+        navigate('/auth/login', { replace: true });
+      } else {
+        toast({
+          title: 'Error',
+          description: result.error,
+          variant: 'destructive',
+        });
+      }
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   // Show loading state while checking authentication
   if (loading) {
@@ -58,12 +82,28 @@ export function ProtectedRoute({
             <h2 className="text-xl font-semibold text-red-600 mb-2">
               Access Denied
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-foreground/70 mb-4">
               You don't have permission to access this page.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-foreground/60">
               Required role: {Array.isArray(requiredRole) ? requiredRole.join(' or ') : requiredRole}
             </p>
+            <div className="mt-6 flex justify-center">
+              <Button
+                variant="outline"
+                onClick={handleSignOut}
+                disabled={isSigningOut}
+              >
+                {isSigningOut ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing out…
+                  </>
+                ) : (
+                  'Sign Out'
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -106,3 +146,4 @@ export function WarehouseRoute({ children }: { children: ReactNode }) {
     </ProtectedRoute>
   );
 }
+

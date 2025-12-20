@@ -334,3 +334,4 @@ const authFlow = {
 - Admins can manage products and view orders
 - Mobile-responsive design works on all devices
 - Secure magic link authentication implemented
+

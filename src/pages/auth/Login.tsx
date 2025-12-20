@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Mail } from 'lucide-react';
-import { requestMagicLink } from '@/lib/auth';
+import { requestMagicLink, isAuthenticated, getCurrentUser } from '@/lib/auth';
 import { toast } from '@/hooks/use-toast';
 
 const Login = () => {
@@ -33,11 +33,30 @@ const Login = () => {
       const result = await requestMagicLink({ email });
 
       if (result.success) {
-        setIsSuccess(true);
-        toast({
-          title: 'Magic link sent!',
-          description: 'Check your email for the sign-in link.',
-        });
+        // Check if user was auto-signed in (demo users)
+        if (isAuthenticated()) {
+          const user = getCurrentUser();
+          toast({
+            title: 'Welcome!',
+            description: `Successfully signed in as ${user?.email}`,
+          });
+
+          // Redirect based on user role
+          if (user?.role === 'customer') {
+            navigate('/customer/catalog');
+          } else if (user?.role === 'admin' || user?.role === 'manager' || user?.role === 'warehouse') {
+            navigate('/admin');
+          } else {
+            navigate('/');
+          }
+        } else {
+          // Non-demo user - show success message for magic link
+          setIsSuccess(true);
+          toast({
+            title: 'Magic link sent!',
+            description: 'Check your email for the sign-in link.',
+          });
+        }
       } else {
         toast({
           title: 'Failed to send magic link',

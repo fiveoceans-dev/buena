@@ -467,3 +467,4 @@ export function useNetworkStatus() {
 
 // Add React import at the top since we're using React hooks
 import React from 'react';
+

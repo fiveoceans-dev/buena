@@ -358,3 +358,4 @@ export async function getSubscriptionPlans() {
 export async function getSupportedPaymentMethods() {
   return paymentService.getSupportedMethods();
 }
+

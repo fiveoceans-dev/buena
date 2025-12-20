@@ -1,3 +1,4 @@
+import React from 'react';
 import { mockDb } from '@/data/mockData';
 
 export interface CacheEntry {
@@ -241,7 +242,7 @@ class PerformanceService {
   // Lazy Loading Utilities
   static lazyLoadComponent<T extends React.ComponentType<any>>(
     importFunc: () => Promise<{ default: T }>
-  ): React.ComponentType<React.ComponentProps<T>> {
+  ): React.LazyExoticComponent<T> {
     return React.lazy(importFunc);
   }
 
@@ -283,10 +284,10 @@ class PerformanceService {
     // Preload critical resources for a route
     switch (route) {
       case '/admin':
-        this.preloadResource('/admin/dashboard.js', 'script');
+        // Note: Vite handles code-splitting filenames; avoid preloading non-existent JS paths here.
         break;
       case '/customer':
-        this.preloadResource('/customer/catalog.js', 'script');
+        // Note: Vite handles code-splitting filenames; avoid preloading non-existent JS paths here.
         break;
       default:
         break;
@@ -506,15 +507,14 @@ export function createLazyComponent<T extends React.ComponentType<any>>(
 ) {
   const LazyComponent = React.lazy(importFunc);
 
-  return React.forwardRef<any, React.ComponentProps<T>>((props, ref) => {
-    const FallbackComponent = () => fallback || React.createElement('div', null, 'Loading...');
-    const SuspenseComponent = React.createElement(React.Suspense, { fallback: React.createElement(FallbackComponent) },
-      React.createElement(LazyComponent, { ...props, ref })
-    );
+  const Wrapped: React.FC<React.ComponentProps<T>> = (props) => (
+    React.createElement(
+      React.Suspense,
+      { fallback: fallback ?? React.createElement('div', null, 'Loading...') },
+      React.createElement(LazyComponent, props as any)
+    )
+  );
 
-    return SuspenseComponent;
-  });
+  Wrapped.displayName = 'LazyComponent';
+  return Wrapped;
 }
-
-// Add React import
-import React from 'react';
