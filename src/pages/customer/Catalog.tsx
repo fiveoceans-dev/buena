@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchField } from '@/components/ui/search-field';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import {
-  Search,
   Package
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -183,7 +182,7 @@ const Catalog = () => {
         </div>
 
       <div className="mt-2">
-        <Link to={`/customer/product/${product.id}`}>
+        <Link to={`/product/${product.id}`}>
           {/* Reserve space for exactly two lines (even for short names) */}
           <div className="mt-2 text-[12px] font-medium leading-4 text-black line-clamp-2 min-h-8">
             {product.name}
@@ -227,18 +226,7 @@ const Catalog = () => {
         </div>
 
           {/* Search and Sort */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-0 top-3 h-4 w-4 text-black/40" />
-                <Input
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-6 border-0 shadow-none rounded-[5px] bg-gray-100 h-9 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
-              </div>
-            </div>
+          <div className="flex flex-wrap items-center gap-4">
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-48 border-0 shadow-none rounded-[5px] px-3 bg-gray-100 h-9 text-xs focus:ring-0 focus-visible:ring-0">
                 <SelectValue />
@@ -251,6 +239,12 @@ const Catalog = () => {
                 ))}
               </SelectContent>
             </Select>
+            <SearchField
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              containerClassName="w-full max-w-sm ml-auto"
+            />
           </div>
 
           {/* Results count */}

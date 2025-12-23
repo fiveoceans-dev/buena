@@ -2,7 +2,7 @@ import { mockDb } from '@/data/mockData';
 import { User } from '@/data/mockData';
 
 // Temporary switch to bypass auth in development.
-export const AUTH_DISABLED = true;
+export const AUTH_DISABLED = false;
 
 const getAuthDisabledUser = (): User | null => {
   return mockDb.getUserByEmail('admin@buena.com') || mockDb.getUsers()[0] || null;
@@ -22,7 +22,7 @@ export interface AuthResult {
 export interface AuthUser {
   id: string;
   email: string;
-  role: 'admin' | 'manager' | 'warehouse' | 'customer' | null;
+  role: 'admin' | 'customer' | null;
   profile: User | null;
 }
 
@@ -31,7 +31,7 @@ class AuthService {
   private readonly TOKEN_KEY = 'buena_auth_token';
   private readonly USER_KEY = 'buena_current_user';
 
-  // Mock magic link - just stores the email and creates user if needed
+  // Simple email login - creates user if needed, no verification flow
   async requestMagicLink({ email }: MagicLinkRequest): Promise<AuthResult> {
     try {
       // Check if user exists, create if not
@@ -46,21 +46,8 @@ class AuthService {
         });
       }
 
-      // In a real app, this would send an email
-      // For demo, we'll just simulate success and auto-signin
-      console.log(`Magic link would be sent to: ${email}`);
-
-      // Auto-signin for demo users
-      if (email.includes('@buena.com')) {
-        this.setUser(user);
-        return { success: true, user };
-      }
-
-      // Store temporary auth data for non-demo users
-      localStorage.setItem(this.TOKEN_KEY, `temp_${email}_${Date.now()}`);
-      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-
-      return { success: true };
+      this.setUser(user);
+      return { success: true, user };
     } catch (error) {
       return {
         success: false,

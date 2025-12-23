@@ -8,8 +8,7 @@ export default function AdminIndex() {
       <Route path="orders" element={<Navigate to="/orders" replace />} />
       <Route path="inventory" element={<Navigate to="/inventory" replace />} />
       <Route path="customers" element={<Navigate to="/customers" replace />} />
-      <Route path="pricing" element={<Navigate to="/pricing" replace />} />
-      <Route path="analytics" element={<Navigate to="/analytics" replace />} />
+      <Route path="pricing" element={<Navigate to="/prices" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

@@ -46,8 +46,8 @@ const ProductDetail = () => {
     <div className="space-y-10 text-black">
       <div className="flex flex-col gap-2 text-[11px] uppercase tracking-[0.2em] text-black/60 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
-          <Link to="/customer/catalog" className="hover:underline underline-offset-4">
-            Catalog
+          <Link to="/products" className="hover:underline underline-offset-4">
+            Products
           </Link>
           <span className="text-black/30">/</span>
           <span>{product.category}</span>

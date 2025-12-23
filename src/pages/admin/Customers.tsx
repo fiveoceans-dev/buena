@@ -1,70 +1,93 @@
-import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableCell } from '@/components/ui/table';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { mockDb } from '@/data/mockData';
+import { AdminPage, AdminPageHeader, AdminSearch, AdminTabsList } from '@/components/admin/AdminPage';
+import { AdminTable, AdminTableBody, AdminTableHead, AdminTableHeader, AdminTableRow } from '@/components/admin/AdminTable';
 
 export default function Customers() {
   const users = mockDb.getUsers();
   const customers = users.filter(u => u.role === 'customer');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const active = customers.filter(c => c.isActive).length;
+  const filteredCustomers = customers.filter((c) => {
+    const query = searchTerm.toLowerCase();
+    const name = `${c.firstName ?? ''} ${c.lastName ?? ''}`.toLowerCase();
+    const email = c.email?.toLowerCase() ?? '';
+
+    return !query || name.includes(query) || email.includes(query);
+  });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-        <Button variant="outline" disabled>
-          Invite (soon)
-        </Button>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        title="Customers"
+        actions={
+          <Button
+            variant="link"
+            className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black/70"
+            disabled
+          >
+            Add Customer
+          </Button>
+        }
+        secondaryActions={
+          <Button
+            variant="link"
+            className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black/70"
+            disabled
+          >
+            Send Invite
+          </Button>
+        }
+      />
 
-      <div className="text-sm text-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span>
-          Total: <span className="font-medium text-foreground tabular-nums">{customers.length}</span>
-        </span>
-        <span aria-hidden="true">•</span>
-        <span>
-          Active: <span className="font-medium text-foreground tabular-nums">{active}</span>
-        </span>
-      </div>
+      <Tabs defaultValue="all">
+        <AdminTabsList tabs={[{ value: 'all', label: 'All' }]} />
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {customers.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell className="font-medium">{c.email}</TableCell>
-                <TableCell>{`${c.firstName ?? ''} ${c.lastName ?? ''}`.trim() || '-'}</TableCell>
-                <TableCell>
-                  {c.isActive ? (
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">active</Badge>
-                  ) : (
-                    <Badge variant="secondary">inactive</Badge>
-                  )}
-                </TableCell>
-                <TableCell>{new Date(c.createdAt).toLocaleDateString()}</TableCell>
-              </TableRow>
-            ))}
-            {customers.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-foreground/70 py-8">
-                  No customers yet.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+        <TabsContent value="all" className="mt-6 space-y-4">
+          <AdminSearch
+            placeholder="Search customers..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          <AdminTable>
+            <AdminTableHeader>
+              <AdminTableRow>
+                <AdminTableHead>Email</AdminTableHead>
+                <AdminTableHead>Name</AdminTableHead>
+                <AdminTableHead>Status</AdminTableHead>
+                <AdminTableHead>Created</AdminTableHead>
+              </AdminTableRow>
+            </AdminTableHeader>
+            <AdminTableBody>
+              {filteredCustomers.map((c) => (
+                <AdminTableRow key={c.id}>
+                  <TableCell className="px-2 py-3 font-medium">{c.email}</TableCell>
+                  <TableCell className="px-2 py-3">
+                    {`${c.firstName ?? ''} ${c.lastName ?? ''}`.trim() || '-'}
+                  </TableCell>
+                  <TableCell className="px-2 py-3">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-black/50">
+                      {c.isActive ? 'active' : 'inactive'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-2 py-3">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
+                </AdminTableRow>
+              ))}
+              {filteredCustomers.length === 0 && (
+                <AdminTableRow>
+                  <TableCell colSpan={4} className="text-center text-black/60 py-8">
+                    No customers yet.
+                  </TableCell>
+                </AdminTableRow>
+              )}
+            </AdminTableBody>
+          </AdminTable>
+        </TabsContent>
+      </Tabs>
+    </AdminPage>
   );
 }
-
-

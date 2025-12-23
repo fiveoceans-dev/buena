@@ -26,39 +26,32 @@ const navItems: NavItem[] = [
   {
     title: 'Dashboard',
     href: '/dashboard',
-    roles: ['admin', 'manager', 'warehouse'],
+    roles: ['admin'],
   },
   {
     title: 'Products',
     href: '/products',
-    roles: ['admin', 'manager'],
+    roles: ['admin'],
   },
   {
     title: 'Orders',
     href: '/orders',
-    roles: ['admin', 'manager', 'warehouse'],
+    roles: ['admin'],
   },
   {
     title: 'Inventory',
     href: '/inventory',
-    roles: ['admin', 'manager', 'warehouse'],
-    badge: 'New'
+    roles: ['admin'],
+  },
+  {
+    title: 'Prices',
+    href: '/prices',
+    roles: ['admin'],
   },
   {
     title: 'Customers',
     href: '/customers',
-    roles: ['admin', 'manager'],
-  },
-  {
-    title: 'Pricing',
-    href: '/pricing',
-    roles: ['admin', 'manager'],
-    badge: 'New'
-  },
-  {
-    title: 'Analytics',
-    href: '/analytics',
-    roles: ['admin', 'manager'],
+    roles: ['admin'],
   },
   {
     title: 'Settings',
@@ -123,9 +116,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       {/* Mobile menu */}
       {sidebarOpen && (
         <div className="md:hidden px-4 pb-6 space-y-6">
-          <div className="text-[11px] uppercase tracking-[0.2em] text-black">
-            Buena Retailing
-          </div>
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:underline underline-offset-4"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <img src="/logo.svg" alt="" className="h-4 w-auto" aria-hidden="true" />
+            <span>Buena Retailing</span>
+          </Link>
           <div className="text-xs text-black/60 space-y-2">
             <div className="flex items-center gap-2">
               <User className="h-3.5 w-3.5" />
@@ -172,9 +170,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex gap-10">
           {/* Left side menu (desktop) */}
           <aside className="hidden md:block w-48 shrink-0">
-            <div className="text-[11px] uppercase tracking-[0.2em] text-black">
-              Buena Retailing
-            </div>
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black hover:underline underline-offset-4"
+            >
+              <img src="/logo.svg" alt="" className="h-4 w-auto" aria-hidden="true" />
+              <span>Buena Retailing</span>
+            </Link>
             <div className="mt-6 text-xs text-black/60 space-y-2">
               <div className="flex items-center gap-2">
                 <User className="h-3.5 w-3.5" />

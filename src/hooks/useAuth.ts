@@ -4,7 +4,7 @@ import { AUTH_DISABLED, getAuthUser, User } from '@/lib/auth';
 export interface AuthUser {
   id: string;
   email: string;
-  role: 'admin' | 'manager' | 'warehouse' | 'customer' | null;
+  role: 'admin' | 'customer' | null;
   profile: User | null;
 }
 
@@ -43,8 +43,6 @@ export function useAuth() {
     loading,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
-    isManager: user?.role === 'manager' || user?.role === 'admin',
-    isWarehouse: user?.role === 'warehouse' || user?.role === 'admin',
     isCustomer: user?.role === 'customer',
   };
 }
@@ -91,11 +89,11 @@ export function usePermissions() {
 
   return {
     loading: false,
-    canManageProducts: ['admin', 'manager'].includes(role || ''),
-    canManageOrders: ['admin', 'manager', 'warehouse'].includes(role || ''),
+    canManageProducts: role === 'admin',
+    canManageOrders: role === 'admin',
     canManageUsers: role === 'admin',
-    canViewAnalytics: ['admin', 'manager'].includes(role || ''),
-    canManageInventory: ['admin', 'manager', 'warehouse'].includes(role || ''),
+    canViewAnalytics: role === 'admin',
+    canManageInventory: role === 'admin',
   };
 }
 
@@ -103,5 +101,5 @@ export function usePermissions() {
  * Hook to check if user can access admin features
  */
 export function useAdminAccess() {
-  return useRoleCheck(['admin', 'manager', 'warehouse']);
+  return useRoleCheck('admin');
 }

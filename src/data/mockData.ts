@@ -5,7 +5,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'admin' | 'manager' | 'warehouse' | 'customer';
+  role: 'admin' | 'customer';
   isActive: boolean;
   createdAt: string;
 }
@@ -327,7 +327,7 @@ export const mockUsers: User[] = [
     email: 'manager@buena.com',
     firstName: 'Store',
     lastName: 'Manager',
-    role: 'manager',
+    role: 'admin',
     isActive: true,
     createdAt: '2024-01-01T00:00:00Z'
   },
@@ -336,7 +336,7 @@ export const mockUsers: User[] = [
     email: 'warehouse@buena.com',
     firstName: 'Warehouse',
     lastName: 'Staff',
-    role: 'warehouse',
+    role: 'admin',
     isActive: true,
     createdAt: '2024-01-01T00:00:00Z'
   },

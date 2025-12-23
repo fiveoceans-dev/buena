@@ -5,8 +5,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { X, Upload, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -148,11 +146,11 @@ const ProductForm = ({ product, onSubmit, onCancel }: ProductFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="space-y-3">
+        <div className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+          Basic Information
+        </div>
+        <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Product Name *</Label>
@@ -231,112 +229,125 @@ const ProductForm = ({ product, onSubmit, onCancel }: ProductFormProps) => {
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Images */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Product Images</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-4 gap-4">
-            {images.map((image, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={image}
-                  alt={`Product image ${index + 1}`}
-                  className="w-full h-24 object-cover rounded-lg border"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            ))}
+      <div className="space-y-3">
+        <div className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+          Images
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          {images.map((image, index) => (
+            <div key={index} className="space-y-2">
+              <img
+                src={image}
+                alt={`Product image ${index + 1}`}
+                className="w-full h-24 object-cover border border-black/10"
+              />
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                className="text-[10px] uppercase tracking-[0.2em] text-black/50 hover:text-black inline-flex items-center gap-1"
+              >
+                <X className="h-3 w-3" />
+                Remove
+              </button>
+            </div>
+          ))}
 
-            {images.length < 4 && (
-              <label className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-                <div className="text-center">
-                  <Upload className="h-6 w-6 text-gray-400 mx-auto mb-1" />
-                  <span className="text-sm text-gray-500">Add Image</span>
-                </div>
-              </label>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+          {images.length < 4 && (
+            <label className="w-full h-24 border border-black/10 flex items-center justify-center cursor-pointer hover:border-black/30">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <span className="text-[10px] uppercase tracking-[0.2em] text-black/50 inline-flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                Add Image
+              </span>
+            </label>
+          )}
+        </div>
+      </div>
 
       {/* Tags */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Tags</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex space-x-2">
-            <Input
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              placeholder="Add a tag"
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-            />
-            <Button type="button" onClick={addTag} variant="outline">
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
+      <div className="space-y-3">
+        <div className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+          Tags
+        </div>
+        <div className="flex space-x-2">
+          <Input
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            placeholder="Add a tag"
+            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+          />
+          <Button
+            type="button"
+            onClick={addTag}
+            variant="link"
+            className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
 
-          <div className="flex flex-wrap gap-2">
-            {formData.tags?.map((tag) => (
-              <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => removeTag(tag)}
-                  className="hover:text-red-600"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        <div className="flex flex-wrap gap-2">
+          {formData.tags?.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-2 border border-black/10 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-black/60"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => removeTag(tag)}
+                className="text-black/40 hover:text-black"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Product Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="active"
-              checked={formData.status === 'active'}
-              onCheckedChange={(checked) =>
-                handleInputChange('status', checked ? 'active' : 'inactive')
-              }
-            />
-            <Label htmlFor="active">Active (visible to customers)</Label>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="space-y-3">
+        <div className="text-[11px] uppercase tracking-[0.2em] text-black/60">
+          Status
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="active"
+            checked={formData.status === 'active'}
+            onCheckedChange={(checked) =>
+              handleInputChange('status', checked ? 'active' : 'inactive')
+            }
+          />
+          <Label htmlFor="active">Active (visible to customers)</Label>
+        </div>
+      </div>
 
       {/* Actions */}
-      <div className="flex justify-end space-x-3 pt-6 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex justify-end space-x-4 pt-4">
+        <Button
+          type="button"
+          variant="link"
+          onClick={onCancel}
+          className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black"
+        >
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          variant="link"
+          className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/60 hover:text-black"
+        >
           {isSubmitting ? 'Saving...' : (product ? 'Update Product' : 'Create Product')}
         </Button>
       </div>

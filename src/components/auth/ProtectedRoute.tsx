@@ -126,24 +126,12 @@ export function AdminRoute({ children }: { children: ReactNode }) {
 }
 
 /**
- * Manager or Admin route guard
+ * Customer-only route guard
  */
-export function ManagerRoute({ children }: { children: ReactNode }) {
+export function CustomerRoute({ children }: { children: ReactNode }) {
   return (
-    <ProtectedRoute requiredRole={['admin', 'manager']}>
+    <ProtectedRoute requiredRole="customer">
       {children}
     </ProtectedRoute>
   );
 }
-
-/**
- * Warehouse, Manager, or Admin route guard
- */
-export function WarehouseRoute({ children }: { children: ReactNode }) {
-  return (
-    <ProtectedRoute requiredRole={['admin', 'manager', 'warehouse']}>
-      {children}
-    </ProtectedRoute>
-  );
-}
-

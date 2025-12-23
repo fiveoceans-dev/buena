@@ -2,28 +2,15 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableCell } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  DollarSign,
-  Percent,
-  Tag,
-  Calendar,
-  Users,
-  Package,
-  Plus,
-  Edit,
-  Trash2,
-  TrendingUp,
-  Gift,
-  Target
-} from 'lucide-react';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { mockDb } from '@/data/mockData';
 import { toast } from '@/hooks/use-toast';
+import { AdminPage, AdminPageHeader, AdminSearch, AdminTabsList } from '@/components/admin/AdminPage';
+import { AdminTable, AdminTableBody, AdminTableHead, AdminTableHeader, AdminTableRow } from '@/components/admin/AdminTable';
 
 const Pricing = () => {
   const [activeTab, setActiveTab] = useState('tiers');
@@ -31,10 +18,28 @@ const Pricing = () => {
   const [isCreatePromoDialogOpen, setIsCreatePromoDialogOpen] = useState(false);
   const [editingTier, setEditingTier] = useState<any>(null);
   const [editingPromo, setEditingPromo] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Get data
   const pricingTiers = mockDb.getPricingTiers();
   const promotions = mockDb.getPromotions();
+
+  const filteredTiers = pricingTiers.filter((tier) => {
+    const query = searchTerm.toLowerCase();
+    const name = tier.name?.toLowerCase() ?? '';
+    const type = tier.customer_type?.toLowerCase() ?? '';
+
+    return !query || name.includes(query) || type.includes(query);
+  });
+
+  const filteredPromotions = promotions.filter((promo) => {
+    const query = searchTerm.toLowerCase();
+    const name = promo.name?.toLowerCase() ?? '';
+    const description = promo.description?.toLowerCase() ?? '';
+    const type = promo.type?.toLowerCase() ?? '';
+
+    return !query || name.includes(query) || description.includes(query) || type.includes(query);
+  });
 
   // Calculate pricing impact
   const activePromotions = promotions.filter(p => p.is_active);
@@ -96,16 +101,6 @@ const Pricing = () => {
     });
   };
 
-  const getPromotionTypeIcon = (type: string) => {
-    switch (type) {
-      case 'percentage': return Percent;
-      case 'fixed': return DollarSign;
-      case 'buy_x_get_y': return Gift;
-      case 'free_shipping': return Package;
-      default: return Tag;
-    }
-  };
-
   const getCustomerTypeLabel = (type: string) => {
     switch (type) {
       case 'individual': return 'Individual';
@@ -117,118 +112,111 @@ const Pricing = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pricing & Promotions</h1>
-        </div>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        title="Prices"
+        actions={
+          <Dialog open={isCreateTierDialogOpen} onOpenChange={setIsCreateTierDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="link"
+                className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black/70"
+              >
+                Add Tier
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create Pricing Tier</DialogTitle>
+                <DialogDescription>
+                  Set up a new pricing tier for customer segmentation
+                </DialogDescription>
+              </DialogHeader>
+              <PricingTierForm onSubmit={handleCreateTier} onCancel={() => setIsCreateTierDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        }
+      />
 
-      {/* Single-line metrics */}
-      <div className="text-sm text-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span>
-          Tiers: <span className="font-medium text-foreground tabular-nums">{pricingTiers.length}</span>
-        </span>
-        <span aria-hidden="true">•</span>
-        <span>
-          Promotions: <span className="font-medium text-foreground tabular-nums">{activePromotions.length}</span>
-        </span>
-        <span aria-hidden="true">•</span>
-        <span>
-          Discount value:{' '}
-          <span className="font-medium text-foreground tabular-nums">
-            ${totalDiscountValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-        </span>
-      </div>
-
-      {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="tiers">Pricing Tiers</TabsTrigger>
-          <TabsTrigger value="promotions">Promotions</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+        <AdminTabsList
+          tabs={[
+            { value: 'tiers', label: 'Pricing Tiers' },
+            { value: 'promotions', label: 'Promotions' },
+          ]}
+        />
 
-        <TabsContent value="tiers" className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium">Pricing Tiers</div>
-              <Dialog open={isCreateTierDialogOpen} onOpenChange={setIsCreateTierDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Tier
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create Pricing Tier</DialogTitle>
-                    <DialogDescription>
-                      Set up a new pricing tier for customer segmentation
-                    </DialogDescription>
-                  </DialogHeader>
-                  <PricingTierForm onSubmit={handleCreateTier} onCancel={() => setIsCreateTierDialogOpen(false)} />
-                </DialogContent>
-              </Dialog>
-            </div>
+        <TabsContent value="tiers" className="mt-6 space-y-4">
+          <AdminSearch
+            placeholder="Search tiers..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Customer Type</TableHead>
-                    <TableHead>Min Quantity</TableHead>
-                    <TableHead>Discount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pricingTiers.map((tier) => (
-                    <TableRow key={tier.id}>
-                      <TableCell className="font-medium">{tier.name}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {getCustomerTypeLabel(tier.customer_type)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{tier.min_quantity}+ units</TableCell>
-                      <TableCell>
-                        {tier.discount_percentage > 0 ? (
-                          <span className="text-green-600">{tier.discount_percentage}% off</span>
-                        ) : (
-                          <span className="text-blue-600">${tier.discount_amount} off</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={tier.is_active ? 'default' : 'secondary'}>
-                          {tier.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="ghost" size="sm" onClick={() => setEditingTier(tier)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteTier(tier.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
+          <AdminTable>
+            <AdminTableHeader>
+              <AdminTableRow>
+                <AdminTableHead>Name</AdminTableHead>
+                <AdminTableHead>Customer</AdminTableHead>
+                <AdminTableHead>Min Qty</AdminTableHead>
+                <AdminTableHead>Discount</AdminTableHead>
+                <AdminTableHead>Status</AdminTableHead>
+                <AdminTableHead>Actions</AdminTableHead>
+              </AdminTableRow>
+            </AdminTableHeader>
+            <AdminTableBody>
+                {filteredTiers.map((tier) => (
+                  <AdminTableRow key={tier.id}>
+                    <TableCell className="px-2 py-3 font-medium">{tier.name}</TableCell>
+                    <TableCell className="px-2 py-3">
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-black/50">
+                        {getCustomerTypeLabel(tier.customer_type)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-2 py-3">{tier.min_quantity}+ units</TableCell>
+                    <TableCell className="px-2 py-3">
+                      {tier.discount_percentage > 0 ? (
+                        <span className="text-black">{tier.discount_percentage}% off</span>
+                      ) : (
+                        <span className="text-black">${tier.discount_amount} off</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="px-2 py-3">
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-black/50">
+                        {tier.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-2 py-3">
+                      <div className="flex items-center gap-4 text-xs text-black/60">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto p-0 text-xs text-black/60 hover:text-black"
+                          onClick={() => setEditingTier(tier)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto p-0 text-xs text-black/60 hover:text-black"
+                          onClick={() => handleDeleteTier(tier.id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </AdminTableRow>
+                ))}
+                {filteredTiers.length === 0 && (
+                  <AdminTableRow>
+                    <TableCell colSpan={6} className="text-center text-black/60 py-8">
+                      No pricing tiers yet.
+                    </TableCell>
+                  </AdminTableRow>
+                )}
+            </AdminTableBody>
+          </AdminTable>
 
           {/* Edit Tier Dialog */}
           <Dialog open={!!editingTier} onOpenChange={() => setEditingTier(null)}>
@@ -250,86 +238,99 @@ const Pricing = () => {
           </Dialog>
         </TabsContent>
 
-        <TabsContent value="promotions" className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium">Promotions</div>
-              <Dialog open={isCreatePromoDialogOpen} onOpenChange={setIsCreatePromoDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Promotion
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>Create Promotion</DialogTitle>
-                    <DialogDescription>
-                      Set up a new promotional campaign
-                    </DialogDescription>
-                  </DialogHeader>
-                  <PromotionForm onSubmit={handleCreatePromotion} onCancel={() => setIsCreatePromoDialogOpen(false)} />
-                </DialogContent>
-              </Dialog>
-            </div>
+        <TabsContent value="promotions" className="mt-6 space-y-4">
+          <AdminSearch
+            placeholder="Search promotions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
-            <div className="space-y-4">
-              {promotions.map((promo) => {
-                const TypeIcon = getPromotionTypeIcon(promo.type);
-                return (
-                  <div key={promo.id} className="border-l-4 border-l-blue-500 rounded-md border p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <TypeIcon className="h-8 w-8 text-blue-600" />
-                        <div>
-                          <h3 className="font-semibold">{promo.name}</h3>
-                          <p className="text-sm text-foreground/70">{promo.description}</p>
-                          <div className="flex items-center space-x-2 mt-2">
-                            <Badge variant="outline">{promo.type.replace('_', ' ')}</Badge>
-                            <Badge variant={promo.is_active ? 'default' : 'secondary'}>
-                              {promo.is_active ? 'Active' : 'Inactive'}
-                            </Badge>
-                            <span className="text-sm text-foreground/70">
-                              Used {promo.usage_count} times
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <div className="text-right">
-                          <div className="font-medium">
-                            {promo.type === 'percentage' ? `${promo.discount_value}% off` :
-                             promo.type === 'fixed' ? `$${promo.discount_value} off` :
-                             promo.type === 'free_shipping' ? 'Free Shipping' :
-                             `${promo.discount_value} items free`}
-                          </div>
-                          <div className="text-sm text-foreground/70">
-                            Valid until {new Date(promo.valid_until || promo.valid_from).toLocaleDateString()}
-                          </div>
-                        </div>
-                        <div className="flex flex-col space-y-1">
-                          <Switch
-                            checked={promo.is_active}
-                            onCheckedChange={(checked) => handleTogglePromotion(promo.id, checked)}
-                          />
-                          <Button variant="ghost" size="sm" onClick={() => setEditingPromo(promo)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {promotions.length === 0 && (
-                <div className="text-center py-8 text-foreground/70">
-                  <Target className="h-12 w-12 mx-auto mb-4 text-foreground/30" />
-                  <p>No promotional campaigns yet</p>
-                </div>
-              )}
-            </div>
+          <div className="flex items-center justify-end">
+            <Dialog open={isCreatePromoDialogOpen} onOpenChange={setIsCreatePromoDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black/70"
+                >
+                  Create Promotion
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Create Promotion</DialogTitle>
+                  <DialogDescription>
+                    Set up a new promotional campaign
+                  </DialogDescription>
+                </DialogHeader>
+                <PromotionForm onSubmit={handleCreatePromotion} onCancel={() => setIsCreatePromoDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
           </div>
+
+          <AdminTable>
+            <AdminTableHeader>
+              <AdminTableRow>
+                <AdminTableHead>Name</AdminTableHead>
+                <AdminTableHead>Type</AdminTableHead>
+                <AdminTableHead>Value</AdminTableHead>
+                <AdminTableHead>Usage</AdminTableHead>
+                <AdminTableHead>Status</AdminTableHead>
+                <AdminTableHead>Actions</AdminTableHead>
+              </AdminTableRow>
+            </AdminTableHeader>
+            <AdminTableBody>
+              {filteredPromotions.map((promo) => (
+                <AdminTableRow key={promo.id}>
+                  <TableCell className="px-2 py-3">
+                    <div className="font-medium text-black">{promo.name}</div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+                      {promo.type.replace('_', ' ')}
+                    </div>
+                    <div className="mt-1 text-black/50">{promo.description}</div>
+                  </TableCell>
+                  <TableCell className="px-2 py-3">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-black/50">
+                      {promo.type.replace('_', ' ')}
+                    </span>
+                  </TableCell>
+                  <TableCell className="px-2 py-3">
+                    {promo.type === 'percentage' ? `${promo.discount_value}% off` :
+                     promo.type === 'fixed' ? `$${promo.discount_value} off` :
+                     promo.type === 'free_shipping' ? 'Free Shipping' :
+                     `${promo.discount_value} items free`}
+                  </TableCell>
+                  <TableCell className="px-2 py-3">Used {promo.usage_count} times</TableCell>
+                  <TableCell className="px-2 py-3">
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+                      {promo.is_active ? 'Active' : 'Inactive'}
+                    </div>
+                    <div className="text-black/50">
+                      Valid until {new Date(promo.valid_until || promo.valid_from).toLocaleDateString()}
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-2 py-3">
+                    <div className="flex items-center gap-4 text-[10px] uppercase tracking-[0.2em]">
+                      <Switch
+                        checked={promo.is_active}
+                        onCheckedChange={(checked) => handleTogglePromotion(promo.id, checked)}
+                      />
+                      <Button variant="ghost" size="sm" className="h-auto p-0" onClick={() => setEditingPromo(promo)}>
+                        Edit
+                      </Button>
+                    </div>
+                  </TableCell>
+                </AdminTableRow>
+              ))}
+
+              {filteredPromotions.length === 0 && (
+                <AdminTableRow>
+                  <TableCell colSpan={6} className="text-center text-black/60 py-8">
+                    No promotional campaigns yet.
+                  </TableCell>
+                </AdminTableRow>
+              )}
+            </AdminTableBody>
+          </AdminTable>
 
           {/* Edit Promotion Dialog */}
           <Dialog open={!!editingPromo} onOpenChange={() => setEditingPromo(null)}>
@@ -351,48 +352,8 @@ const Pricing = () => {
           </Dialog>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-md border p-4 space-y-3">
-              <div className="text-sm font-medium">Pricing Impact</div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">
-                    23%
-                  </div>
-                  <p className="text-sm text-foreground/70">Avg Discount Rate</p>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">
-                    $1,450
-                  </div>
-                  <p className="text-sm text-foreground/70">Monthly Savings</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-md border p-4 space-y-3">
-              <div className="text-sm font-medium">Promotion Performance</div>
-              <div className="space-y-3">
-                {activePromotions.slice(0, 3).map((promo) => (
-                  <div key={promo.id} className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm">{promo.name}</p>
-                      <p className="text-xs text-foreground/70">{promo.usage_count} redemptions</p>
-                    </div>
-                    <Badge variant="outline">
-                      {promo.type === 'percentage' ? `${promo.discount_value}%` :
-                       promo.type === 'fixed' ? `$${promo.discount_value}` :
-                       'Free'}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </TabsContent>
       </Tabs>
-    </div>
+    </AdminPage>
   );
 };
 
@@ -490,11 +451,20 @@ const PricingTierForm = ({ tier, onSubmit, onCancel }: any) => {
         <Label htmlFor="is_active">Active</Label>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex justify-end space-x-4 pt-4">
+        <Button
+          type="button"
+          variant="link"
+          onClick={onCancel}
+          className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black"
+        >
           Cancel
         </Button>
-        <Button type="submit">
+        <Button
+          type="submit"
+          variant="link"
+          className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/60 hover:text-black"
+        >
           {tier ? 'Update Tier' : 'Create Tier'}
         </Button>
       </div>
@@ -622,11 +592,20 @@ const PromotionForm = ({ promotion, onSubmit, onCancel }: any) => {
         <Label htmlFor="is_active">Active</Label>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex justify-end space-x-4 pt-4">
+        <Button
+          type="button"
+          variant="link"
+          onClick={onCancel}
+          className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/50 hover:text-black"
+        >
           Cancel
         </Button>
-        <Button type="submit">
+        <Button
+          type="submit"
+          variant="link"
+          className="h-auto p-0 text-[11px] uppercase tracking-[0.2em] text-black/60 hover:text-black"
+        >
           {promotion ? 'Update Promotion' : 'Create Promotion'}
         </Button>
       </div>
@@ -635,4 +614,3 @@ const PromotionForm = ({ promotion, onSubmit, onCancel }: any) => {
 };
 
 export default Pricing;
-

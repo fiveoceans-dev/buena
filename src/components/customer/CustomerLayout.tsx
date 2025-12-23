@@ -4,14 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/lib/auth';
 import { toast } from '@/hooks/use-toast';
-import {
-  User,
-  LogOut,
-  Package,
-  Settings,
-  Menu,
-  X
-} from 'lucide-react';
+import { User, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface CustomerLayoutProps {
@@ -42,7 +35,7 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
   };
 
   const isActive = (href: string) =>
-    location.pathname === href || (href === '/customer/catalog' && location.pathname === '/dashboard');
+    location.pathname === href || (href === '/products' && location.pathname === '/dashboard');
 
   return (
     <div className="min-h-screen bg-white">
@@ -64,16 +57,16 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
         <div className="md:hidden px-4 pb-4">
           <nav className="space-y-3 text-sm text-black">
             <Link
-              to="/customer/catalog"
+              to="/products"
               onClick={() => setMobileMenuOpen(false)}
-              className={(isActive('/customer/catalog') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
+              className={(isActive('/products') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
             >
               Products
             </Link>
             <Link
-              to="/customer/settings"
+              to="/settings"
               onClick={() => setMobileMenuOpen(false)}
-              className={(isActive('/customer/settings') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
+              className={(isActive('/settings') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
             >
               Settings
             </Link>
@@ -85,8 +78,9 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
         <div className="flex gap-10">
           {/* Left side menu (desktop) */}
           <aside className="hidden md:block w-40 shrink-0">
-            <div className="text-[11px] uppercase tracking-[0.2em] text-black">
-              Buena Retailing
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-black">
+              <img src="/logo.svg" alt="" className="h-4 w-auto" aria-hidden="true" />
+              <span>Buena Retailing</span>
             </div>
             <div className="mt-8 text-xs text-black/60 space-y-2">
               <div className="flex items-center gap-2">
@@ -106,14 +100,14 @@ export function CustomerLayout({ children }: CustomerLayoutProps) {
             {/* Menu items under Log out */}
             <nav className="mt-6 space-y-3 text-sm text-black">
               <Link
-                to="/customer/catalog"
-                className={(isActive('/customer/catalog') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
+                to="/products"
+                className={(isActive('/products') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
               >
                 Products
               </Link>
               <Link
-                to="/customer/settings"
-                className={(isActive('/customer/settings') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
+                to="/settings"
+                className={(isActive('/settings') ? 'underline underline-offset-4' : 'hover:underline underline-offset-4') + ' block'}
               >
                 Settings
               </Link>

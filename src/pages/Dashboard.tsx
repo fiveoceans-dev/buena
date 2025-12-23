@@ -3,9 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { CustomerLayout } from '@/components/customer/CustomerLayout';
 import AdminDashboard from './admin/Dashboard';
-import Analytics from './admin/Analytics';
-import Inventory from './admin/Inventory';
-import Catalog from './customer/Catalog';
+import Products from './admin/Products';
 
 export default function DashboardPage() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -28,16 +26,12 @@ export default function DashboardPage() {
   if (user?.role === 'customer') {
     return (
       <CustomerLayout>
-        <Catalog />
+        <Products />
       </CustomerLayout>
     );
   }
 
-  const adminContent = user?.role === 'warehouse'
-    ? <Inventory />
-    : user?.role === 'manager'
-      ? <Analytics />
-      : <AdminDashboard />;
+  const adminContent = <AdminDashboard />;
 
   return (
     <AdminLayout>
