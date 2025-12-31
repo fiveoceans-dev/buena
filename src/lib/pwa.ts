@@ -26,6 +26,13 @@ class PWAService {
 
   // Initialize PWA functionality
   private async initializePWA() {
+    if (import.meta.env.DEV) {
+      await this.clearServiceWorkersAndCaches();
+      this.setupInstallPrompt();
+      this.setupNetworkListeners();
+      return;
+    }
+
     if ('serviceWorker' in navigator) {
       try {
         this.registration = await navigator.serviceWorker.register('/sw.js', {
@@ -324,6 +331,18 @@ class PWAService {
     }
   }
 
+  private async clearServiceWorkersAndCaches(): Promise<void> {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+    }
+
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+    }
+  }
+
   // Check network status
   isOnline(): boolean {
     return navigator.onLine;
@@ -467,4 +486,3 @@ export function useNetworkStatus() {
 
 // Add React import at the top since we're using React hooks
 import React from 'react';
-

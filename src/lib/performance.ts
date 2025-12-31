@@ -362,6 +362,10 @@ class PerformanceService {
 
   // Service Worker Integration
   registerServiceWorker(): void {
+    if (import.meta.env.DEV) {
+      return;
+    }
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js', { scope: '/' })
         .then((registration) => {
